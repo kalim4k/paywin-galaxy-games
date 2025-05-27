@@ -55,18 +55,18 @@ export const GameGrid = () => {
             key={game.id}
             className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300 group"
           >
-            <div className={`w-full h-24 bg-gradient-to-r ${game.gradient} rounded-lg mb-3 flex items-center justify-center relative overflow-hidden`}>
+            <div className="w-full aspect-square bg-gray-800/30 rounded-lg mb-3 relative overflow-hidden">
               <img 
                 src={game.image} 
                 alt={game.name}
-                className="w-16 h-16 object-cover rounded-lg z-10"
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all"></div>
               
               {/* Play button overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
-                  <Play className="w-6 h-6 text-white" />
+                <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                  <Play className="w-8 h-8 text-white" />
                 </div>
               </div>
             </div>
