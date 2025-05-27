@@ -8,7 +8,7 @@ export const GameGrid = () => {
       id: 'mine',
       name: 'MINE',
       description: 'Découvrez les diamants cachés',
-      icon: '💎',
+      image: 'https://orawin.fun/wp-content/uploads/2025/05/MAGIC-4.png',
       gradient: 'from-blue-500 to-blue-700',
       players: '1,247',
       trend: '+12%'
@@ -17,25 +17,25 @@ export const GameGrid = () => {
       id: 'lucky-jet',
       name: 'LUCKY JET',
       description: 'Volez vers la fortune',
-      icon: '🚀',
+      image: 'https://orawin.fun/wp-content/uploads/2025/05/MAGIC-2.png',
       gradient: 'from-orange-500 to-red-600',
       players: '892',
       trend: '+8%'
     },
     {
-      id: 'double',
-      name: 'DOUBLE',
-      description: 'Doublez vos gains',
-      icon: '⚡',
+      id: 'dice',
+      name: 'DICE',
+      description: 'Lancez les dés de la fortune',
+      image: 'https://orawin.fun/wp-content/uploads/2025/05/MAGIC-1.png',
       gradient: 'from-green-500 to-emerald-600',
       players: '2,156',
       trend: '+15%'
     },
     {
-      id: 'link',
-      name: 'LINK',
-      description: 'Connectez pour gagner',
-      icon: '🔗',
+      id: 'plinko',
+      name: 'PLINKO',
+      description: 'Faites tomber la balle gagnante',
+      image: 'https://orawin.fun/wp-content/uploads/2025/05/MAGIC-3.png',
       gradient: 'from-pink-500 to-purple-600',
       players: '673',
       trend: '+5%'
@@ -55,8 +55,12 @@ export const GameGrid = () => {
             key={game.id}
             className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300 group"
           >
-            <div className={`w-full h-24 bg-gradient-to-r ${game.gradient} rounded-lg mb-3 flex items-center justify-center text-3xl relative overflow-hidden`}>
-              <span className="z-10">{game.icon}</span>
+            <div className={`w-full h-24 bg-gradient-to-r ${game.gradient} rounded-lg mb-3 flex items-center justify-center relative overflow-hidden`}>
+              <img 
+                src={game.image} 
+                alt={game.name}
+                className="w-16 h-16 object-cover rounded-lg z-10"
+              />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all"></div>
               
               {/* Play button overlay */}

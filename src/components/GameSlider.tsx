@@ -11,28 +11,28 @@ export const GameSlider = () => {
       title: "MINE",
       subtitle: "Trouvez les diamants cachés",
       gradient: "from-blue-500 to-purple-600",
-      image: "💎"
+      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-4.png"
     },
     {
       id: 2,
       title: "LUCKY JET",
       subtitle: "Montez jusqu'aux étoiles",
       gradient: "from-orange-500 to-red-600", 
-      image: "🚀"
+      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-2.png"
     },
     {
       id: 3,
-      title: "DOUBLE",
-      subtitle: "Doublez vos gains instantanément",
+      title: "DICE",
+      subtitle: "Lancez les dés de la fortune",
       gradient: "from-green-500 to-emerald-600",
-      image: "⚡"
+      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-1.png"
     },
     {
       id: 4,
-      title: "LINK",
-      subtitle: "Connectez pour gagner",
+      title: "PLINKO",
+      subtitle: "Faites tomber la balle gagnante",
       gradient: "from-pink-500 to-violet-600",
-      image: "🔗"
+      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-3.png"
     }
   ];
 
@@ -70,7 +70,13 @@ export const GameSlider = () => {
                   Jouer maintenant
                 </button>
               </div>
-              <div className="text-6xl opacity-20">{slide.image}</div>
+              <div className="w-20 h-20 flex-shrink-0">
+                <img 
+                  src={slide.image} 
+                  alt={slide.title}
+                  className="w-full h-full object-cover rounded-lg opacity-80"
+                />
+              </div>
               
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full transform translate-x-16 -translate-y-16"></div>
