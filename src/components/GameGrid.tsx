@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Play, Star, TrendingUp, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -35,7 +34,7 @@ export const GameGrid = () => {
       gradient: 'from-green-500 to-emerald-600',
       players: '2,156',
       trend: '+15%',
-      path: '#'
+      path: '/dice'
     },
     {
       id: 'plinko',
