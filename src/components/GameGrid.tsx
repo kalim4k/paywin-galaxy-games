@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { Play, Star, TrendingUp, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const GameGrid = () => {
+  const navigate = useNavigate();
+  
   const games = [
     {
       id: 'mine',
@@ -11,7 +14,8 @@ export const GameGrid = () => {
       image: 'https://orawin.fun/wp-content/uploads/2025/05/MAGIC-4.png',
       gradient: 'from-blue-500 to-blue-700',
       players: '1,247',
-      trend: '+12%'
+      trend: '+12%',
+      path: '/mine'
     },
     {
       id: 'lucky-jet',
@@ -20,7 +24,8 @@ export const GameGrid = () => {
       image: 'https://orawin.fun/wp-content/uploads/2025/05/MAGIC-2.png',
       gradient: 'from-orange-500 to-red-600',
       players: '892',
-      trend: '+8%'
+      trend: '+8%',
+      path: '#'
     },
     {
       id: 'dice',
@@ -29,7 +34,8 @@ export const GameGrid = () => {
       image: 'https://orawin.fun/wp-content/uploads/2025/05/MAGIC-1.png',
       gradient: 'from-green-500 to-emerald-600',
       players: '2,156',
-      trend: '+15%'
+      trend: '+15%',
+      path: '#'
     },
     {
       id: 'plinko',
@@ -38,9 +44,16 @@ export const GameGrid = () => {
       image: 'https://orawin.fun/wp-content/uploads/2025/05/MAGIC-3.png',
       gradient: 'from-pink-500 to-purple-600',
       players: '673',
-      trend: '+5%'
+      trend: '+5%',
+      path: '#'
     }
   ];
+
+  const handleGameClick = (game: typeof games[0]) => {
+    if (game.path !== '#') {
+      navigate(game.path);
+    }
+  };
 
   return (
     <div className="px-4">
@@ -53,7 +66,8 @@ export const GameGrid = () => {
         {games.map((game) => (
           <div
             key={game.id}
-            className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-3 border border-white/10 hover:border-white/20 transition-all duration-300 group"
+            onClick={() => handleGameClick(game)}
+            className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-3 border border-white/10 hover:border-white/20 transition-all duration-300 group cursor-pointer"
           >
             <div className="w-full aspect-square bg-gray-800/30 rounded-lg mb-2 relative overflow-hidden">
               <img 
