@@ -53,9 +53,9 @@ export const GameGrid = () => {
         {games.map((game) => (
           <div
             key={game.id}
-            className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all duration-300 group"
+            className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-3 border border-white/10 hover:border-white/20 transition-all duration-300 group"
           >
-            <div className="w-full aspect-square bg-gray-800/30 rounded-lg mb-3 relative overflow-hidden">
+            <div className="w-full aspect-square bg-gray-800/30 rounded-lg mb-2 relative overflow-hidden">
               <img 
                 src={game.image} 
                 alt={game.name}
@@ -65,14 +65,11 @@ export const GameGrid = () => {
               
               {/* Play button overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
-                  <Play className="w-8 h-8 text-white" />
+                <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
+                  <Play className="w-10 h-10 text-white" />
                 </div>
               </div>
             </div>
-
-            <h3 className="text-white font-bold text-sm mb-1">{game.name}</h3>
-            <p className="text-gray-400 text-xs mb-3">{game.description}</p>
 
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center space-x-1 text-gray-400">
