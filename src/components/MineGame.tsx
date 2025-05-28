@@ -14,19 +14,14 @@ export const MineGame = () => {
   const [won, setWon] = useState(false);
   const [revealedStars, setRevealedStars] = useState(0);
 
-  // Calculer le multiplicateur basé sur les bombes et les étoiles trouvées
+  // Calculer le multiplicateur avec des cotes très faibles
   const calculateMultiplier = (starsFound: number, bombCount: number) => {
-    const totalCells = 25;
-    const safeCells = totalCells - bombCount;
-    let multiplier = 1;
+    if (starsFound === 0) return 1;
     
-    for (let i = 0; i < starsFound; i++) {
-      const remainingSafe = safeCells - i;
-      const remainingTotal = totalCells - i;
-      multiplier *= remainingTotal / remainingSafe;
-    }
+    // Multiplicateur très faible - seulement 1% d'augmentation par étoile
+    const baseMultiplier = 1 + (starsFound * 0.01);
     
-    return Math.max(1, Number(multiplier.toFixed(2)));
+    return Math.max(1, Number(baseMultiplier.toFixed(3)));
   };
 
   // Calculer les prochains multiplicateurs possibles
@@ -50,8 +45,11 @@ export const MineGame = () => {
     const newBoard = Array(25).fill('star');
     const bombPositions = [];
     
-    // Placer les bombes aléatoirement
-    while (bombPositions.length < bombs) {
+    // Augmenter drastiquement les chances de tomber sur une bombe
+    // en plaçant les bombes de manière plus agressive
+    const totalBombs = Math.max(bombs, Math.floor(25 * 0.4)); // Au moins 40% de bombes
+    
+    while (bombPositions.length < totalBombs) {
       const pos = Math.floor(Math.random() * 25);
       if (!bombPositions.includes(pos)) {
         bombPositions.push(pos);
@@ -95,6 +93,9 @@ export const MineGame = () => {
 
   const cashOut = () => {
     if (isPlaying && revealedStars > 0) {
+      // Révéler toutes les bombes quand le joueur récupère ses gains
+      const allRevealed = gameBoard.map((cell, i) => cell === 'bomb' || revealedCells[i]);
+      setRevealedCells(allRevealed);
       setGameEnded(true);
       setWon(true);
       setIsPlaying(false);
@@ -127,9 +128,9 @@ export const MineGame = () => {
   const nextMultipliers = getNextMultipliers();
 
   return (
-    <div className="px-4 py-4">
+    <div className="px-4 py-2">
       {/* Grille de jeu */}
-      <div className="bg-gray-800/50 rounded-2xl p-4 mb-4">
+      <div className="bg-gray-800/50 rounded-2xl p-3 mb-3">
         <div className="grid grid-cols-5 gap-2">
           {gameBoard.map((cell, index) => (
             <button
@@ -162,21 +163,21 @@ export const MineGame = () => {
         </div>
       </div>
 
-      {/* Progression des gains */}
+      {/* Progression des gains avec cotes très faibles */}
       {isPlaying && !gameEnded && (
-        <div className="bg-gray-800/30 rounded-xl p-3 mb-4">
+        <div className="bg-gray-800/30 rounded-xl p-2 mb-3">
           <div className="flex items-center space-x-2 mb-2">
             <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span className="text-white text-sm font-medium">
+            <span className="text-white text-xs font-medium">
               Prochaine étape: {(bet * calculateMultiplier(revealedStars + 1, bombs)).toLocaleString()} FCFA
             </span>
           </div>
-          <div className="flex space-x-2 overflow-x-auto">
+          <div className="flex space-x-1 overflow-x-auto">
             {nextMultipliers.map((mult, index) => (
               <div
                 key={index}
                 className={`
-                  min-w-fit px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap
+                  min-w-fit px-2 py-1 rounded-lg text-xs font-medium whitespace-nowrap
                   ${index === 0 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-gray-700/50 text-gray-300'}
                 `}
               >
@@ -188,22 +189,22 @@ export const MineGame = () => {
       )}
 
       {/* Contrôles de jeu - Plus compacts */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         {/* Sélection du nombre de bombes */}
-        <div className="bg-gray-800/30 rounded-xl p-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-white text-sm font-medium">Bombes</span>
-            <span className="text-yellow-400 text-sm font-bold">{bombs}</span>
+        <div className="bg-gray-800/30 rounded-xl p-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-white text-xs font-medium">Bombes</span>
+            <span className="text-yellow-400 text-xs font-bold">{bombs}</span>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             <button
               onClick={() => adjustBombs(-1)}
               disabled={isPlaying || bombs <= 1}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-2 transition-colors"
+              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-1.5 transition-colors"
             >
-              <Minus className="w-4 h-4 text-white" />
+              <Minus className="w-3 h-3 text-white" />
             </button>
-            <div className="flex-1 bg-gray-700 rounded-lg h-2">
+            <div className="flex-1 bg-gray-700 rounded-lg h-1.5">
               <div 
                 className="bg-gradient-to-r from-orange-500 to-red-500 h-full rounded-lg transition-all"
                 style={{ width: `${(bombs / 24) * 100}%` }}
@@ -212,26 +213,26 @@ export const MineGame = () => {
             <button
               onClick={() => adjustBombs(1)}
               disabled={isPlaying || bombs >= 24}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-2 transition-colors"
+              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-1.5 transition-colors"
             >
-              <Plus className="w-4 h-4 text-white" />
+              <Plus className="w-3 h-3 text-white" />
             </button>
           </div>
         </div>
 
         {/* Contrôle de mise */}
-        <div className="bg-gray-800/30 rounded-xl p-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-white text-sm font-medium">Votre mise</span>
-            <span className="text-green-400 text-sm font-bold">{bet.toLocaleString()} FCFA</span>
+        <div className="bg-gray-800/30 rounded-xl p-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-white text-xs font-medium">Votre mise</span>
+            <span className="text-green-400 text-xs font-bold">{bet.toLocaleString()} FCFA</span>
           </div>
           <div className="flex items-center space-x-2">
             <button
               onClick={() => adjustBet(-100)}
               disabled={isPlaying}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-2 transition-colors"
+              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-1.5 transition-colors"
             >
-              <Minus className="w-4 h-4 text-white" />
+              <Minus className="w-3 h-3 text-white" />
             </button>
             <div className="flex-1 text-center">
               <input
@@ -239,16 +240,16 @@ export const MineGame = () => {
                 value={bet}
                 onChange={(e) => !isPlaying && setBet(Math.max(200, parseInt(e.target.value) || 200))}
                 disabled={isPlaying}
-                className="bg-gray-700 text-white text-center rounded-lg p-2 w-full disabled:opacity-50 font-medium text-sm"
+                className="bg-gray-700 text-white text-center rounded-lg p-1.5 w-full disabled:opacity-50 font-medium text-xs"
                 min="200"
               />
             </div>
             <button
               onClick={() => adjustBet(100)}
               disabled={isPlaying}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-2 transition-colors"
+              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-1.5 transition-colors"
             >
-              <Plus className="w-4 h-4 text-white" />
+              <Plus className="w-3 h-3 text-white" />
             </button>
           </div>
         </div>
@@ -258,7 +259,7 @@ export const MineGame = () => {
           {!isPlaying ? (
             <Button
               onClick={startGame}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 text-base rounded-xl"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2.5 text-sm rounded-xl"
             >
               Jouer
             </Button>
@@ -267,7 +268,7 @@ export const MineGame = () => {
               {revealedStars > 0 && !gameEnded && (
                 <Button
                   onClick={cashOut}
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 text-base rounded-xl"
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-2.5 text-sm rounded-xl"
                 >
                   {potentialWin.toLocaleString()} FCFA - Retirer
                 </Button>
@@ -277,12 +278,12 @@ export const MineGame = () => {
 
           {gameEnded && (
             <div className="space-y-2">
-              <div className={`text-center p-3 rounded-xl ${won ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+              <div className={`text-center p-2 rounded-xl text-xs ${won ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                 {won ? `Félicitations! Vous avez gagné ${potentialWin.toLocaleString()} FCFA!` : 'Boom! Vous avez touché une bombe!'}
               </div>
               <Button
                 onClick={resetGame}
-                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-3 text-base rounded-xl"
+                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-2.5 text-sm rounded-xl"
               >
                 Rejouer
               </Button>
