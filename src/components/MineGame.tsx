@@ -4,7 +4,7 @@ import { Bomb, Star, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react
 import { Button } from './ui/button';
 
 export const MineGame = () => {
-  const [bet, setBet] = useState(1);
+  const [bet, setBet] = useState(200);
   const [bombs, setBombs] = useState(3);
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameBoard, setGameBoard] = useState<('hidden' | 'star' | 'bomb')[]>(Array(25).fill('hidden'));
@@ -110,7 +110,7 @@ export const MineGame = () => {
 
   const adjustBet = (amount: number) => {
     if (!isPlaying) {
-      setBet(Math.max(1, bet + amount));
+      setBet(Math.max(200, bet + amount));
     }
   };
 
@@ -165,7 +165,7 @@ export const MineGame = () => {
           <div className="flex items-center space-x-2 mb-3">
             <Star className="w-5 h-5 text-yellow-400 fill-current" />
             <span className="text-white text-sm font-medium">
-              Next step {(bet * calculateMultiplier(revealedStars + 1, bombs)).toFixed(2)} $
+              Prochain gain {(bet * calculateMultiplier(revealedStars + 1, bombs)).toFixed(0)} FCFA
             </span>
             <div className="flex space-x-2 ml-auto">
               {nextMultipliers.map((mult, index) => (
@@ -186,7 +186,7 @@ export const MineGame = () => {
         <div className="bg-gray-800/50 rounded-2xl p-4 mb-3">
           {/* Bombes */}
           <div className="flex items-center justify-between mb-4">
-            <span className="text-white text-lg font-medium">traps</span>
+            <span className="text-white text-lg font-medium">Bombes</span>
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => adjustBombs(-1)}
@@ -208,18 +208,18 @@ export const MineGame = () => {
 
           {/* Mise */}
           <div className="flex items-center justify-between">
-            <span className="text-gray-400 text-lg">Your bid</span>
+            <span className="text-gray-400 text-lg">Votre mise</span>
             <div className="flex items-center space-x-3">
               <button
-                onClick={() => adjustBet(-1)}
-                disabled={bet <= 1}
+                onClick={() => adjustBet(-100)}
+                disabled={bet <= 200}
                 className="bg-gray-700/80 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl p-3 transition-colors"
               >
                 <Minus className="w-5 h-5 text-white" />
               </button>
-              <span className="text-white text-2xl font-bold min-w-[3rem] text-center">{bet}</span>
+              <span className="text-white text-2xl font-bold min-w-[4rem] text-center">{bet} FCFA</span>
               <button
-                onClick={() => adjustBet(1)}
+                onClick={() => adjustBet(100)}
                 className="bg-gray-700/80 hover:bg-gray-600 rounded-xl p-3 transition-colors"
               >
                 <Plus className="w-5 h-5 text-white" />
@@ -236,7 +236,7 @@ export const MineGame = () => {
             onClick={startGame}
             className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold py-4 text-lg rounded-2xl"
           >
-            Play
+            Jouer
           </Button>
         ) : (
           <>
@@ -245,7 +245,7 @@ export const MineGame = () => {
                 onClick={cashOut}
                 className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 text-lg rounded-2xl"
               >
-                {potentialWin.toFixed(2)} $ - Take
+                {potentialWin.toFixed(0)} FCFA - Récupérer
               </Button>
             )}
           </>
@@ -254,7 +254,7 @@ export const MineGame = () => {
         {gameEnded && (
           <div className="space-y-3">
             <div className={`text-center p-3 rounded-xl text-sm ${won ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-              {won ? `Félicitations! Vous avez gagné ${potentialWin.toFixed(2)} $!` : 'Boom! Vous avez touché une bombe!'}
+              {won ? `Félicitations! Vous avez gagné ${potentialWin.toFixed(0)} FCFA!` : 'Boom! Vous avez touché une bombe!'}
             </div>
             <Button
               onClick={resetGame}
