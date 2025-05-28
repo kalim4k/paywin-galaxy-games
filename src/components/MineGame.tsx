@@ -29,6 +29,23 @@ export const MineGame = () => {
     return Math.max(1, Number(multiplier.toFixed(2)));
   };
 
+  // Calculer les prochains multiplicateurs possibles
+  const getNextMultipliers = () => {
+    const multipliers = [];
+    for (let i = 1; i <= 5; i++) {
+      const nextStars = revealedStars + i;
+      if (nextStars <= 25 - bombs) {
+        const mult = calculateMultiplier(nextStars, bombs);
+        multipliers.push({
+          stars: nextStars,
+          multiplier: mult,
+          amount: bet * mult
+        });
+      }
+    }
+    return multipliers;
+  };
+
   const initializeBoard = () => {
     const newBoard = Array(25).fill('star');
     const bombPositions = [];
@@ -107,51 +124,36 @@ export const MineGame = () => {
   };
 
   const potentialWin = bet * currentMultiplier;
+  const nextMultipliers = getNextMultipliers();
 
   return (
     <div className="px-4 py-6">
-      {/* Header du jeu */}
-      <div className="text-center mb-6">
-        <h1 className="text-white text-2xl font-bold mb-2">MINE</h1>
-        <p className="text-gray-400 text-sm">Trouvez les étoiles et évitez les bombes</p>
-      </div>
-
-      {/* Solde actuel */}
-      <div className="bg-gradient-to-r from-green-500/20 to-emerald-600/20 rounded-xl p-4 mb-6 text-center">
-        <div className="text-white text-lg font-bold">
-          {potentialWin > bet ? `Gain potentiel: ${potentialWin.toLocaleString()} FCFA` : `Mise: ${bet.toLocaleString()} FCFA`}
-        </div>
-        {currentMultiplier > 1 && (
-          <div className="text-yellow-400 text-sm">Multiplicateur: x{currentMultiplier}</div>
-        )}
-      </div>
-
       {/* Grille de jeu */}
-      <div className="bg-gray-800/30 rounded-xl p-4 mb-6">
-        <div className="grid grid-cols-5 gap-2">
+      <div className="bg-gray-800/50 rounded-2xl p-6 mb-6">
+        <div className="grid grid-cols-5 gap-3">
           {gameBoard.map((cell, index) => (
             <button
               key={index}
               onClick={() => handleCellClick(index)}
               disabled={!isPlaying || revealedCells[index] || gameEnded}
               className={`
-                aspect-square rounded-lg border-2 transition-all duration-200
+                aspect-square rounded-xl border-2 transition-all duration-200 text-lg font-bold
                 ${revealedCells[index] 
                   ? cell === 'bomb' 
-                    ? 'bg-red-500 border-red-400' 
-                    : 'bg-green-500 border-green-400'
-                  : 'bg-blue-500/70 border-blue-400 hover:bg-blue-400 active:scale-95'
+                    ? 'bg-red-500 border-red-400 shadow-lg shadow-red-500/30' 
+                    : 'bg-yellow-500 border-yellow-400 shadow-lg shadow-yellow-500/30'
+                  : 'bg-blue-500/80 border-blue-400/60 hover:bg-blue-400 hover:border-blue-300 active:scale-95'
                 }
-                ${!isPlaying || gameEnded ? 'opacity-50' : 'hover:border-white/50'}
+                ${!isPlaying || gameEnded ? 'opacity-50' : 'hover:shadow-lg hover:shadow-blue-500/20'}
                 flex items-center justify-center
               `}
             >
               {revealedCells[index] && (
                 <>
                   {cell === 'bomb' ? (
-                    <Bomb className="w-6 h-6 text-white" />
+                    <Bomb className="w-7 h-7 text-white" />
                   ) : (
-                    <Star className="w-6 h-6 text-white fill-current" />
+                    <Star className="w-7 h-7 text-white fill-current" />
                   )}
                 </>
               )}
@@ -160,13 +162,38 @@ export const MineGame = () => {
         </div>
       </div>
 
+      {/* Progression des gains */}
+      {isPlaying && !gameEnded && (
+        <div className="bg-gray-800/30 rounded-xl p-4 mb-6">
+          <div className="flex items-center space-x-2 mb-3">
+            <Star className="w-5 h-5 text-yellow-400 fill-current" />
+            <span className="text-white text-sm font-medium">
+              Prochaine étape: {(bet * calculateMultiplier(revealedStars + 1, bombs)).toLocaleString()} FCFA
+            </span>
+          </div>
+          <div className="flex space-x-2 overflow-x-auto">
+            {nextMultipliers.map((mult, index) => (
+              <div
+                key={index}
+                className={`
+                  min-w-fit px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap
+                  ${index === 0 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-gray-700/50 text-gray-300'}
+                `}
+              >
+                x{mult.multiplier}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Contrôles de jeu */}
       <div className="space-y-4">
         {/* Sélection du nombre de bombes */}
         <div className="bg-gray-800/30 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-white text-sm font-medium">Bombes</span>
-            <span className="text-yellow-400 text-sm">{bombs}</span>
+            <span className="text-yellow-400 text-sm font-bold">{bombs}</span>
           </div>
           <div className="flex items-center space-x-4">
             <button
@@ -195,8 +222,8 @@ export const MineGame = () => {
         {/* Contrôle de mise */}
         <div className="bg-gray-800/30 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-white text-sm font-medium">Mise</span>
-            <span className="text-green-400 text-sm">{bet.toLocaleString()} FCFA</span>
+            <span className="text-white text-sm font-medium">Votre mise</span>
+            <span className="text-green-400 text-sm font-bold">{bet.toLocaleString()} FCFA</span>
           </div>
           <div className="flex items-center space-x-2">
             <button
@@ -212,7 +239,7 @@ export const MineGame = () => {
                 value={bet}
                 onChange={(e) => !isPlaying && setBet(Math.max(200, parseInt(e.target.value) || 200))}
                 disabled={isPlaying}
-                className="bg-gray-700 text-white text-center rounded-lg p-2 w-full disabled:opacity-50"
+                className="bg-gray-700 text-white text-center rounded-lg p-3 w-full disabled:opacity-50 font-medium"
                 min="200"
               />
             </div>
@@ -231,7 +258,7 @@ export const MineGame = () => {
           {!isPlaying ? (
             <Button
               onClick={startGame}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 text-lg"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 text-lg rounded-xl"
             >
               Jouer
             </Button>
@@ -240,9 +267,9 @@ export const MineGame = () => {
               {revealedStars > 0 && !gameEnded && (
                 <Button
                   onClick={cashOut}
-                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 text-lg"
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 text-lg rounded-xl"
                 >
-                  Encaisser {potentialWin.toLocaleString()} FCFA
+                  {potentialWin.toLocaleString()} FCFA - Retirer
                 </Button>
               )}
             </div>
@@ -255,7 +282,7 @@ export const MineGame = () => {
               </div>
               <Button
                 onClick={resetGame}
-                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 text-lg"
+                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 text-lg rounded-xl"
               >
                 Rejouer
               </Button>
