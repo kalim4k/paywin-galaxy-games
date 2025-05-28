@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Bomb, Star, Plus, Minus } from 'lucide-react';
+import { Bomb, Star, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
 
 export const MineGame = () => {
-  const [bet, setBet] = useState(200);
+  const [bet, setBet] = useState(1);
   const [bombs, setBombs] = useState(3);
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameBoard, setGameBoard] = useState<('hidden' | 'star' | 'bomb')[]>(Array(25).fill('hidden'));
@@ -27,15 +27,11 @@ export const MineGame = () => {
   // Calculer les prochains multiplicateurs possibles
   const getNextMultipliers = () => {
     const multipliers = [];
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 3; i++) {
       const nextStars = revealedStars + i;
       if (nextStars <= 25 - bombs) {
         const mult = calculateMultiplier(nextStars, bombs);
-        multipliers.push({
-          stars: nextStars,
-          multiplier: mult,
-          amount: bet * mult
-        });
+        multipliers.push(mult);
       }
     }
     return multipliers;
@@ -114,7 +110,7 @@ export const MineGame = () => {
 
   const adjustBet = (amount: number) => {
     if (!isPlaying) {
-      setBet(Math.max(200, bet + amount));
+      setBet(Math.max(1, bet + amount));
     }
   };
 
@@ -163,133 +159,111 @@ export const MineGame = () => {
         </div>
       </div>
 
-      {/* Progression des gains avec cotes très faibles */}
+      {/* Affichage des cotes pendant le jeu */}
       {isPlaying && !gameEnded && (
-        <div className="bg-gray-800/30 rounded-xl p-2 mb-3">
-          <div className="flex items-center space-x-2 mb-2">
-            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span className="text-white text-xs font-medium">
-              Prochaine étape: {(bet * calculateMultiplier(revealedStars + 1, bombs)).toLocaleString()} FCFA
+        <div className="bg-gray-800/50 rounded-2xl p-4 mb-3">
+          <div className="flex items-center space-x-2 mb-3">
+            <Star className="w-5 h-5 text-yellow-400 fill-current" />
+            <span className="text-white text-sm font-medium">
+              Next step {(bet * calculateMultiplier(revealedStars + 1, bombs)).toFixed(2)} $
             </span>
-          </div>
-          <div className="flex space-x-1 overflow-x-auto">
-            {nextMultipliers.map((mult, index) => (
-              <div
-                key={index}
-                className={`
-                  min-w-fit px-2 py-1 rounded-lg text-xs font-medium whitespace-nowrap
-                  ${index === 0 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-gray-700/50 text-gray-300'}
-                `}
-              >
-                x{mult.multiplier}
-              </div>
-            ))}
+            <div className="flex space-x-2 ml-auto">
+              {nextMultipliers.map((mult, index) => (
+                <span
+                  key={index}
+                  className="text-gray-400 text-sm font-medium"
+                >
+                  x{mult.toFixed(2)}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
-      {/* Contrôles de jeu - Plus compacts */}
-      <div className="space-y-2">
-        {/* Sélection du nombre de bombes */}
-        <div className="bg-gray-800/30 rounded-xl p-2">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-white text-xs font-medium">Bombes</span>
-            <span className="text-yellow-400 text-xs font-bold">{bombs}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => adjustBombs(-1)}
-              disabled={isPlaying || bombs <= 1}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-1.5 transition-colors"
-            >
-              <Minus className="w-3 h-3 text-white" />
-            </button>
-            <div className="flex-1 bg-gray-700 rounded-lg h-1.5">
-              <div 
-                className="bg-gradient-to-r from-orange-500 to-red-500 h-full rounded-lg transition-all"
-                style={{ width: `${(bombs / 24) * 100}%` }}
-              />
-            </div>
-            <button
-              onClick={() => adjustBombs(1)}
-              disabled={isPlaying || bombs >= 24}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-1.5 transition-colors"
-            >
-              <Plus className="w-3 h-3 text-white" />
-            </button>
-          </div>
-        </div>
-
-        {/* Contrôle de mise */}
-        <div className="bg-gray-800/30 rounded-xl p-2">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-white text-xs font-medium">Votre mise</span>
-            <span className="text-green-400 text-xs font-bold">{bet.toLocaleString()} FCFA</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => adjustBet(-100)}
-              disabled={isPlaying}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-1.5 transition-colors"
-            >
-              <Minus className="w-3 h-3 text-white" />
-            </button>
-            <div className="flex-1 text-center">
-              <input
-                type="number"
-                value={bet}
-                onChange={(e) => !isPlaying && setBet(Math.max(200, parseInt(e.target.value) || 200))}
-                disabled={isPlaying}
-                className="bg-gray-700 text-white text-center rounded-lg p-1.5 w-full disabled:opacity-50 font-medium text-xs"
-                min="200"
-              />
-            </div>
-            <button
-              onClick={() => adjustBet(100)}
-              disabled={isPlaying}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-1.5 transition-colors"
-            >
-              <Plus className="w-3 h-3 text-white" />
-            </button>
-          </div>
-        </div>
-
-        {/* Boutons d'action */}
-        <div className="space-y-2">
-          {!isPlaying ? (
-            <Button
-              onClick={startGame}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2.5 text-sm rounded-xl"
-            >
-              Jouer
-            </Button>
-          ) : (
-            <div className="space-y-2">
-              {revealedStars > 0 && !gameEnded && (
-                <Button
-                  onClick={cashOut}
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-2.5 text-sm rounded-xl"
-                >
-                  {potentialWin.toLocaleString()} FCFA - Retirer
-                </Button>
-              )}
-            </div>
-          )}
-
-          {gameEnded && (
-            <div className="space-y-2">
-              <div className={`text-center p-2 rounded-xl text-xs ${won ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                {won ? `Félicitations! Vous avez gagné ${potentialWin.toLocaleString()} FCFA!` : 'Boom! Vous avez touché une bombe!'}
-              </div>
-              <Button
-                onClick={resetGame}
-                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-2.5 text-sm rounded-xl"
+      {/* Section combinée Bombes + Mise */}
+      {!isPlaying && (
+        <div className="bg-gray-800/50 rounded-2xl p-4 mb-3">
+          {/* Bombes */}
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-white text-lg font-medium">traps</span>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => adjustBombs(-1)}
+                disabled={bombs <= 1}
+                className="bg-gray-700/80 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl p-3 transition-colors"
               >
-                Rejouer
-              </Button>
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </button>
+              <span className="text-white text-2xl font-bold min-w-[2rem] text-center">{bombs}</span>
+              <button
+                onClick={() => adjustBombs(1)}
+                disabled={bombs >= 24}
+                className="bg-gray-700/80 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl p-3 transition-colors"
+              >
+                <ChevronRight className="w-5 h-5 text-white" />
+              </button>
             </div>
-          )}
+          </div>
+
+          {/* Mise */}
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400 text-lg">Your bid</span>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => adjustBet(-1)}
+                disabled={bet <= 1}
+                className="bg-gray-700/80 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl p-3 transition-colors"
+              >
+                <Minus className="w-5 h-5 text-white" />
+              </button>
+              <span className="text-white text-2xl font-bold min-w-[3rem] text-center">{bet}</span>
+              <button
+                onClick={() => adjustBet(1)}
+                className="bg-gray-700/80 hover:bg-gray-600 rounded-xl p-3 transition-colors"
+              >
+                <Plus className="w-5 h-5 text-white" />
+              </button>
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* Boutons d'action */}
+      <div className="space-y-3">
+        {!isPlaying ? (
+          <Button
+            onClick={startGame}
+            className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold py-4 text-lg rounded-2xl"
+          >
+            Play
+          </Button>
+        ) : (
+          <>
+            {revealedStars > 0 && !gameEnded && (
+              <Button
+                onClick={cashOut}
+                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 text-lg rounded-2xl"
+              >
+                {potentialWin.toFixed(2)} $ - Take
+              </Button>
+            )}
+          </>
+        )}
+
+        {gameEnded && (
+          <div className="space-y-3">
+            <div className={`text-center p-3 rounded-xl text-sm ${won ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+              {won ? `Félicitations! Vous avez gagné ${potentialWin.toFixed(2)} $!` : 'Boom! Vous avez touché une bombe!'}
+            </div>
+            <Button
+              onClick={resetGame}
+              className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 text-lg rounded-2xl"
+            >
+              Rejouer
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
