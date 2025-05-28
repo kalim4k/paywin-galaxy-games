@@ -127,10 +127,10 @@ export const MineGame = () => {
   const nextMultipliers = getNextMultipliers();
 
   return (
-    <div className="px-4 py-6">
+    <div className="px-4 py-4">
       {/* Grille de jeu */}
-      <div className="bg-gray-800/50 rounded-2xl p-6 mb-6">
-        <div className="grid grid-cols-5 gap-3">
+      <div className="bg-gray-800/50 rounded-2xl p-4 mb-4">
+        <div className="grid grid-cols-5 gap-2">
           {gameBoard.map((cell, index) => (
             <button
               key={index}
@@ -151,9 +151,9 @@ export const MineGame = () => {
               {revealedCells[index] && (
                 <>
                   {cell === 'bomb' ? (
-                    <Bomb className="w-7 h-7 text-white" />
+                    <Bomb className="w-6 h-6 text-white" />
                   ) : (
-                    <Star className="w-7 h-7 text-white fill-current" />
+                    <Star className="w-6 h-6 text-white fill-current" />
                   )}
                 </>
               )}
@@ -164,9 +164,9 @@ export const MineGame = () => {
 
       {/* Progression des gains */}
       {isPlaying && !gameEnded && (
-        <div className="bg-gray-800/30 rounded-xl p-4 mb-6">
-          <div className="flex items-center space-x-2 mb-3">
-            <Star className="w-5 h-5 text-yellow-400 fill-current" />
+        <div className="bg-gray-800/30 rounded-xl p-3 mb-4">
+          <div className="flex items-center space-x-2 mb-2">
+            <Star className="w-4 h-4 text-yellow-400 fill-current" />
             <span className="text-white text-sm font-medium">
               Prochaine étape: {(bet * calculateMultiplier(revealedStars + 1, bombs)).toLocaleString()} FCFA
             </span>
@@ -176,7 +176,7 @@ export const MineGame = () => {
               <div
                 key={index}
                 className={`
-                  min-w-fit px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap
+                  min-w-fit px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap
                   ${index === 0 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-gray-700/50 text-gray-300'}
                 `}
               >
@@ -187,15 +187,15 @@ export const MineGame = () => {
         </div>
       )}
 
-      {/* Contrôles de jeu */}
-      <div className="space-y-4">
+      {/* Contrôles de jeu - Plus compacts */}
+      <div className="space-y-3">
         {/* Sélection du nombre de bombes */}
-        <div className="bg-gray-800/30 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
+        <div className="bg-gray-800/30 rounded-xl p-3">
+          <div className="flex items-center justify-between mb-2">
             <span className="text-white text-sm font-medium">Bombes</span>
             <span className="text-yellow-400 text-sm font-bold">{bombs}</span>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <button
               onClick={() => adjustBombs(-1)}
               disabled={isPlaying || bombs <= 1}
@@ -220,8 +220,8 @@ export const MineGame = () => {
         </div>
 
         {/* Contrôle de mise */}
-        <div className="bg-gray-800/30 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
+        <div className="bg-gray-800/30 rounded-xl p-3">
+          <div className="flex items-center justify-between mb-2">
             <span className="text-white text-sm font-medium">Votre mise</span>
             <span className="text-green-400 text-sm font-bold">{bet.toLocaleString()} FCFA</span>
           </div>
@@ -229,9 +229,9 @@ export const MineGame = () => {
             <button
               onClick={() => adjustBet(-100)}
               disabled={isPlaying}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-3 transition-colors"
+              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-2 transition-colors"
             >
-              <Minus className="w-5 h-5 text-white" />
+              <Minus className="w-4 h-4 text-white" />
             </button>
             <div className="flex-1 text-center">
               <input
@@ -239,26 +239,26 @@ export const MineGame = () => {
                 value={bet}
                 onChange={(e) => !isPlaying && setBet(Math.max(200, parseInt(e.target.value) || 200))}
                 disabled={isPlaying}
-                className="bg-gray-700 text-white text-center rounded-lg p-3 w-full disabled:opacity-50 font-medium"
+                className="bg-gray-700 text-white text-center rounded-lg p-2 w-full disabled:opacity-50 font-medium text-sm"
                 min="200"
               />
             </div>
             <button
               onClick={() => adjustBet(100)}
               disabled={isPlaying}
-              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-3 transition-colors"
+              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-2 transition-colors"
             >
-              <Plus className="w-5 h-5 text-white" />
+              <Plus className="w-4 h-4 text-white" />
             </button>
           </div>
         </div>
 
         {/* Boutons d'action */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {!isPlaying ? (
             <Button
               onClick={startGame}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 text-lg rounded-xl"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 text-base rounded-xl"
             >
               Jouer
             </Button>
@@ -267,7 +267,7 @@ export const MineGame = () => {
               {revealedStars > 0 && !gameEnded && (
                 <Button
                   onClick={cashOut}
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 text-lg rounded-xl"
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 text-base rounded-xl"
                 >
                   {potentialWin.toLocaleString()} FCFA - Retirer
                 </Button>
@@ -276,13 +276,13 @@ export const MineGame = () => {
           )}
 
           {gameEnded && (
-            <div className="space-y-3">
-              <div className={`text-center p-4 rounded-xl ${won ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+            <div className="space-y-2">
+              <div className={`text-center p-3 rounded-xl ${won ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                 {won ? `Félicitations! Vous avez gagné ${potentialWin.toLocaleString()} FCFA!` : 'Boom! Vous avez touché une bombe!'}
               </div>
               <Button
                 onClick={resetGame}
-                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 text-lg rounded-xl"
+                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-3 text-base rounded-xl"
               >
                 Rejouer
               </Button>
