@@ -5,13 +5,15 @@ import { DiceBetOptions } from './DiceBetOptions';
 import { DiceBetControls } from './DiceBetControls';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export const DiceGame = () => {
+  const { profile, refreshProfile } = useAuth();
   const [selectedColor, setSelectedColor] = useState<'red' | 'black' | 'blue' | null>(null);
   const [betAmount, setBetAmount] = useState(200);
   const [isSpinning, setIsSpinning] = useState(false);
   const [gameResult, setGameResult] = useState<{color: 'red' | 'black' | 'blue', number: number} | null>(null);
-  const [balance, setBalance] = useState(25750);
 
   const colorMultipliers = {
     red: 2,
@@ -19,17 +21,52 @@ export const DiceGame = () => {
     blue: 14
   };
 
-  const handleSpin = () => {
-    if (!selectedColor || isSpinning) return;
+  const updateBalance = async (newBalance: number, transactionType: 'game_win' | 'game_loss', amount: number, description: string) => {
+    if (!profile) return;
+
+    try {
+      // Mettre à jour le solde dans la base de données
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ balance: newBalance, updated_at: new Date().toISOString() })
+        .eq('id', profile.id);
+
+      if (updateError) throw updateError;
+
+      // Créer une transaction dans l'historique
+      const { error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: profile.id,
+          type: transactionType,
+          amount: amount,
+          description: description,
+          status: 'completed'
+        });
+
+      if (transactionError) throw transactionError;
+
+      // Rafraîchir le profil pour mettre à jour l'interface
+      await refreshProfile();
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du solde:', error);
+      toast.error('Erreur lors de la mise à jour du solde');
+    }
+  };
+
+  const handleSpin = async () => {
+    if (!selectedColor || isSpinning || !profile) return;
+
+    if (betAmount > profile.balance) {
+      toast.error('Solde insuffisant pour cette mise');
+      return;
+    }
 
     setIsSpinning(true);
     setGameResult(null);
 
-    // Déduire la mise du solde
-    setBalance(prev => prev - betAmount);
-
     // Simuler le spin (2 secondes)
-    setTimeout(() => {
+    setTimeout(async () => {
       // Générer un résultat aléatoire avec probabilités réalistes
       const random = Math.random();
       let resultColor: 'red' | 'black' | 'blue';
@@ -50,18 +87,32 @@ export const DiceGame = () => {
       setGameResult(result);
       setIsSpinning(false);
 
-      // Calculer les gains si le joueur a gagné
+      // Calculer le nouveau solde et mettre à jour la base de données
       if (result.color === selectedColor) {
-        const winnings = betAmount * result.number;
-        setBalance(prev => prev + winnings);
+        const winnings = betAmount * colorMultipliers[result.color];
+        const newBalance = profile.balance - betAmount + winnings;
         
-        // Notification de victoire
+        await updateBalance(
+          newBalance,
+          'game_win',
+          winnings - betAmount, // Gain net
+          `Gain au jeu de dés - ${result.color === 'red' ? 'Rouge' : result.color === 'black' ? 'Noir' : 'Bleu'} ${result.number}`
+        );
+        
         toast.success(`🎉 Félicitations ! Vous avez gagné ${winnings.toLocaleString()} FCFA !`, {
           description: `Résultat: ${result.color === 'red' ? 'Rouge' : result.color === 'black' ? 'Noir' : 'Bleu'} - ${result.number}`,
           duration: 5000,
         });
       } else {
-        // Notification de perte
+        const newBalance = profile.balance - betAmount;
+        
+        await updateBalance(
+          newBalance,
+          'game_loss',
+          betAmount,
+          `Perte au jeu de dés - ${result.color === 'red' ? 'Rouge' : result.color === 'black' ? 'Noir' : 'Bleu'} ${result.number}`
+        );
+        
         toast.error(`😢 Dommage ! Vous avez perdu ${betAmount.toLocaleString()} FCFA`, {
           description: `Résultat: ${result.color === 'red' ? 'Rouge' : result.color === 'black' ? 'Noir' : 'Bleu'} - ${result.number}`,
           duration: 5000,
@@ -69,6 +120,14 @@ export const DiceGame = () => {
       }
     }, 2000);
   };
+
+  if (!profile) {
+    return (
+      <div className="px-4 py-6 text-center">
+        <p className="text-white">Chargement du profil...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-6 space-y-6">
@@ -96,7 +155,7 @@ export const DiceGame = () => {
       <DiceBetControls 
         betAmount={betAmount}
         onBetChange={setBetAmount}
-        balance={balance}
+        balance={profile.balance}
         isDisabled={isSpinning}
       />
 
@@ -104,7 +163,7 @@ export const DiceGame = () => {
       <div className="space-y-4">
         <Button 
           onClick={handleSpin}
-          disabled={!selectedColor || isSpinning || betAmount > balance}
+          disabled={!selectedColor || isSpinning || betAmount > profile.balance}
           className="w-full h-14 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white text-lg font-bold rounded-xl disabled:opacity-50"
         >
           {isSpinning ? 'Rotation en cours...' : 'JOUER'}
