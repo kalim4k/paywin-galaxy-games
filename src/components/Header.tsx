@@ -1,13 +1,19 @@
 
 import React from 'react';
-import { Coins } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export const Header = () => {
   const { profile } = useAuth();
+  const navigate = useNavigate();
 
   const formatBalance = (balance: number) => {
     return new Intl.NumberFormat('fr-FR').format(balance);
+  };
+
+  const handleDepositClick = () => {
+    navigate('/withdrawal');
   };
 
   return (
@@ -19,11 +25,16 @@ export const Header = () => {
         <h1 className="text-white font-bold text-xl">PAYWIN</h1>
       </div>
       
-      <div className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-emerald-600 px-4 py-2 rounded-full">
-        <Coins className="w-5 h-5 text-white" />
-        <span className="text-white font-semibold">
+      <div className="flex items-center space-x-3">
+        <div className="text-white font-semibold">
           {profile ? `${formatBalance(profile.balance)} FCFA` : '0 FCFA'}
-        </span>
+        </div>
+        <button 
+          onClick={handleDepositClick}
+          className="bg-gradient-to-r from-green-500 to-emerald-600 p-2 rounded-full hover:from-green-600 hover:to-emerald-700 transition-all duration-200"
+        >
+          <Plus className="w-5 h-5 text-white" />
+        </button>
       </div>
     </header>
   );
