@@ -1,8 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Trophy, Medal, Award, Coins } from 'lucide-react';
+import { Trophy, Medal, Award, Coins, TrendingUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface LeaderboardEntry {
@@ -42,14 +43,14 @@ export const Leaderboard = () => {
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Trophy className="w-4 h-4 text-yellow-500" />;
+        return <Trophy className="w-5 h-5 text-yellow-500" />;
       case 2:
-        return <Medal className="w-4 h-4 text-gray-400" />;
+        return <Medal className="w-5 h-5 text-gray-400" />;
       case 3:
-        return <Award className="w-4 h-4 text-amber-600" />;
+        return <Award className="w-5 h-5 text-amber-600" />;
       default:
         return (
-          <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
+          <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
             <span className="text-xs font-bold text-gray-600">{rank}</span>
           </div>
         );
@@ -73,71 +74,97 @@ export const Leaderboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-lg">Chargement du classement...</div>
+        <div className="text-xl">Chargement du classement...</div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-3 py-6">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <Card className="bg-white border border-gray-200 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-xl text-center justify-center">
-              <Trophy className="w-6 h-6 text-yellow-500" />
-              Top 10 Joueurs
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-2 text-2xl text-center justify-center">
+              <Trophy className="w-7 h-7 text-yellow-500" />
+              Top 10 des Joueurs
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-3">
-            <div className="space-y-2">
-              {leaderboard.map((player, index) => {
-                const rank = index + 1;
-                return (
-                  <div
-                    key={player.id}
-                    className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
-                      rank <= 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200' : 'bg-gray-50 border-gray-200'
-                    }`}
-                  >
-                    {/* Rang et Avatar */}
-                    <div className="flex items-center space-x-3 flex-1">
-                      <div className="flex items-center justify-center w-6">
-                        {getRankIcon(rank)}
-                      </div>
-                      
-                      <Avatar className="w-8 h-8">
-                        <AvatarImage src={player.avatar_url || undefined} />
-                        <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-xs">
-                          {player.full_name?.charAt(0)?.toUpperCase() || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-900 truncate">
-                          {player.full_name || 'Utilisateur'}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {getGameDisplayName(player.favorite_game || 'mine')}
-                        </div>
-                      </div>
-                    </div>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b border-gray-200">
+                    <TableHead className="text-left font-semibold text-gray-700">Rang</TableHead>
+                    <TableHead className="text-left font-semibold text-gray-700">Joueur</TableHead>
+                    <TableHead className="text-left font-semibold text-gray-700">Jeu Favori</TableHead>
+                    <TableHead className="text-right font-semibold text-gray-700">Solde</TableHead>
+                    <TableHead className="text-right font-semibold text-gray-700">Retiré</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {leaderboard.map((player, index) => {
+                    const rank = index + 1;
+                    return (
+                      <TableRow
+                        key={player.id}
+                        className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                          rank <= 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50' : ''
+                        }`}
+                      >
+                        {/* Rang */}
+                        <TableCell className="py-4">
+                          <div className="flex items-center justify-center w-8">
+                            {getRankIcon(rank)}
+                          </div>
+                        </TableCell>
 
-                    {/* Solde */}
-                    <div className="text-right">
-                      <div className="flex items-center justify-end gap-1 text-sm font-bold text-green-600">
-                        <Coins className="w-3 h-3" />
-                        <span className="text-xs">{formatAmount(player.balance)}</span>
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Retiré: {formatAmount(player.total_withdrawn || 0)}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                        {/* Joueur (Avatar + Nom) */}
+                        <TableCell className="py-4">
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage src={player.avatar_url || undefined} />
+                              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-sm">
+                                {player.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium text-gray-900">
+                                {player.full_name || 'Utilisateur Anonyme'}
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+
+                        {/* Jeu Favori */}
+                        <TableCell className="py-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {getGameDisplayName(player.favorite_game || 'mine')}
+                          </span>
+                        </TableCell>
+
+                        {/* Solde */}
+                        <TableCell className="py-4 text-right">
+                          <div className="flex items-center justify-end gap-1 text-lg font-bold text-green-600">
+                            <Coins className="w-4 h-4" />
+                            {formatAmount(player.balance)} FCFA
+                          </div>
+                        </TableCell>
+
+                        {/* Montant Retiré */}
+                        <TableCell className="py-4 text-right">
+                          <div className="flex items-center justify-end gap-1 text-sm text-gray-600">
+                            <TrendingUp className="w-4 h-4" />
+                            {formatAmount(player.total_withdrawn || 0)} FCFA
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
 
               {leaderboard.length === 0 && (
-                <div className="text-center py-8 text-gray-500 text-sm">
+                <div className="text-center py-8 text-gray-500">
                   Aucun joueur trouvé dans le classement
                 </div>
               )}
