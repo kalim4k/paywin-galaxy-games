@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import MinePage from "./pages/MinePage";
 import AuthPage from "./pages/AuthPage";
 import DicePage from "./pages/DicePage";
+import WithdrawalPage from "./pages/WithdrawalPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/mine" element={<MinePage />} />
           <Route path="/dice" element={<DicePage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/withdrawal" element={<WithdrawalPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
