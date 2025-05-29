@@ -12,6 +12,8 @@ export const useGameState = () => {
   const [won, setWon] = useState(false);
   const [revealedStars, setRevealedStars] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  // Nouveau: Compteur de bombes placées dynamiquement
+  const [bombsPlaced, setBombsPlaced] = useState(0);
 
   const adjustBet = (amount: number) => {
     if (!isPlaying && !isProcessing) {
@@ -34,6 +36,7 @@ export const useGameState = () => {
     setGameEnded(false);
     setWon(false);
     setRevealedStars(0);
+    setBombsPlaced(0);
   };
 
   return {
@@ -48,6 +51,7 @@ export const useGameState = () => {
     won,
     revealedStars,
     isProcessing,
+    bombsPlaced,
     
     // Setters
     setBet,
@@ -60,6 +64,7 @@ export const useGameState = () => {
     setWon,
     setRevealedStars,
     setIsProcessing,
+    setBombsPlaced,
     
     // Actions
     adjustBet,

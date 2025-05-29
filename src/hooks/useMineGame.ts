@@ -3,7 +3,13 @@ import { useCallback } from 'react';
 import { toast } from '@/components/ui/sonner';
 import { useGameBalance } from './useGameBalance';
 import { useGameState } from './useGameState';
-import { calculateMultiplier, getNextMultipliers, initializeGameBoard } from '@/utils/mineGameUtils';
+import { 
+  calculateMultiplier, 
+  getNextMultipliers, 
+  initializeGameBoard,
+  shouldPlaceBomb,
+  fillRemainingBombs
+} from '@/utils/mineGameUtils';
 
 export const useMineGame = () => {
   const { profile, updateBalance } = useGameBalance();
@@ -18,6 +24,7 @@ export const useMineGame = () => {
     won,
     revealedStars,
     isProcessing,
+    bombsPlaced,
     setIsPlaying,
     setGameBoard,
     setRevealedCells,
@@ -26,6 +33,7 @@ export const useMineGame = () => {
     setWon,
     setRevealedStars,
     setIsProcessing,
+    setBombsPlaced,
     adjustBet,
     adjustBombs,
     resetGame
@@ -39,6 +47,7 @@ export const useMineGame = () => {
     setGameEnded(false);
     setWon(false);
     setRevealedStars(0);
+    setBombsPlaced(0);
   };
 
   const startGame = async () => {
@@ -79,8 +88,23 @@ export const useMineGame = () => {
     newRevealedCells[index] = true;
     setRevealedCells(newRevealedCells);
 
-    if (gameBoard[index] === 'bomb') {
-      const allRevealed = gameBoard.map(() => true);
+    // Décision dynamique : cette cellule devient-elle une bombe ?
+    const shouldBeBomb = shouldPlaceBomb(revealedStars, bombsPlaced, bombs, revealedCells);
+    
+    const newBoard = [...gameBoard];
+    
+    if (shouldBeBomb) {
+      // Placer une bombe dynamiquement
+      newBoard[index] = 'bomb';
+      setGameBoard(newBoard);
+      setBombsPlaced(bombsPlaced + 1);
+      
+      // Placer les bombes restantes sur les cellules non révélées
+      const finalBoard = fillRemainingBombs(newBoard, newRevealedCells, bombsPlaced + 1, bombs);
+      setGameBoard(finalBoard);
+      
+      // Révéler toutes les cellules
+      const allRevealed = Array(25).fill(true);
       setRevealedCells(allRevealed);
       setGameEnded(true);
       setWon(false);
@@ -91,12 +115,15 @@ export const useMineGame = () => {
         duration: 5000,
       });
     } else {
+      // C'est une étoile
       const newStarsFound = revealedStars + 1;
       setRevealedStars(newStarsFound);
       const newMultiplier = calculateMultiplier(newStarsFound, bombs);
       setCurrentMultiplier(newMultiplier);
+      
+      console.log(`Étoile trouvée ! Total: ${newStarsFound}, Bombes placées: ${bombsPlaced}/${bombs}`);
     }
-  }, [isPlaying, revealedCells, gameEnded, gameBoard, revealedStars, bombs, bet]);
+  }, [isPlaying, revealedCells, gameEnded, gameBoard, revealedStars, bombs, bet, bombsPlaced]);
 
   const cashOut = async () => {
     if (!isPlaying || revealedStars === 0 || !profile || isProcessing) return;
@@ -112,8 +139,12 @@ export const useMineGame = () => {
       setWon(true);
       setIsPlaying(false);
       
+      // Placer les bombes restantes sur les cellules non révélées
+      const finalBoard = fillRemainingBombs(gameBoard, revealedCells, bombsPlaced, bombs);
+      setGameBoard(finalBoard);
+      
       // Reveal all cells
-      const allRevealed = gameBoard.map(() => true);
+      const allRevealed = Array(25).fill(true);
       setRevealedCells(allRevealed);
       
       // Show success message immediately
