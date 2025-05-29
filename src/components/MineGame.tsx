@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Bomb, Star, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
@@ -13,14 +14,17 @@ export const MineGame = () => {
   const [won, setWon] = useState(false);
   const [revealedStars, setRevealedStars] = useState(0);
 
-  // Calculer le multiplicateur avec des cotes très faibles
+  // Calculer le multiplicateur avec des cotes améliorées basées sur le nombre de bombes
   const calculateMultiplier = (starsFound: number, bombCount: number) => {
     if (starsFound === 0) return 1;
     
-    // Multiplicateur très faible - seulement 1% d'augmentation par étoile
-    const baseMultiplier = 1 + (starsFound * 0.01);
+    // Base multiplicateur qui augmente avec le nombre de bombes pour plus de récompense
+    const bombMultiplier = 1 + (bombCount * 0.05); // 5% bonus par bombe
+    const starMultiplier = 1 + (starsFound * 0.15); // 15% par étoile trouvée
     
-    return Math.max(1, Number(baseMultiplier.toFixed(3)));
+    const finalMultiplier = bombMultiplier * starMultiplier;
+    
+    return Math.max(1, Number(finalMultiplier.toFixed(3)));
   };
 
   // Calculer les prochains multiplicateurs possibles
@@ -70,8 +74,8 @@ export const MineGame = () => {
     setRevealedCells(newRevealedCells);
 
     if (gameBoard[index] === 'bomb') {
-      // Révéler toutes les bombes
-      const allRevealed = gameBoard.map((cell, i) => cell === 'bomb' || revealedCells[i]);
+      // Révéler toutes les bombes ET toutes les étoiles à la fin de la partie
+      const allRevealed = gameBoard.map(() => true);
       setRevealedCells(allRevealed);
       setGameEnded(true);
       setWon(false);
@@ -85,8 +89,8 @@ export const MineGame = () => {
 
   const cashOut = () => {
     if (isPlaying && revealedStars > 0) {
-      // Révéler toutes les bombes quand le joueur récupère ses gains
-      const allRevealed = gameBoard.map((cell, i) => cell === 'bomb' || revealedCells[i]);
+      // Révéler toutes les bombes ET toutes les étoiles quand le joueur récupère ses gains
+      const allRevealed = gameBoard.map(() => true);
       setRevealedCells(allRevealed);
       setGameEnded(true);
       setWon(true);
