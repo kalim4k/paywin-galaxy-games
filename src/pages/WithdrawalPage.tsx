@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
@@ -7,9 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { User, Wallet, CreditCard, Plus, Minus, LogOut, Settings, Mail, Edit, Eye, EyeOff, Phone, AtSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const WithdrawalPage = () => {
-  const [balance] = useState(125000); // FCFA
+  const { profile, signOut, updateProfile } = useAuth();
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
   const [rechargeCode, setRechargeCode] = useState('');
@@ -17,15 +19,12 @@ const WithdrawalPage = () => {
   const [paymentAddress, setPaymentAddress] = useState('');
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [showProfileDetails, setShowProfileDetails] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editForm, setEditForm] = useState({
+    full_name: profile?.full_name || '',
+    email: profile?.email || ''
+  });
   const { toast } = useToast();
-
-  // Mock user data - in real app this would come from authentication context
-  const userData = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    memberSince: "Janvier 2024",
-    lastLogin: "Il y a 2 heures"
-  };
 
   const paymentMethods = [
     { id: 'moov', name: 'Moov Money', image: 'https://celinaroom.com/wp-content/uploads/2025/01/Moov_Money_Flooz.png', type: 'mobile' },
@@ -79,7 +78,7 @@ const WithdrawalPage = () => {
       });
       return;
     }
-    if (amount > balance) {
+    if (amount > (profile?.balance || 0)) {
       toast({
         title: "Solde insuffisant",
         description: "Votre solde est insuffisant pour ce retrait",
@@ -125,19 +124,44 @@ const WithdrawalPage = () => {
     setPaymentAddress('');
   };
 
-  const handleLogout = () => {
-    toast({
-      title: "Déconnexion",
-      description: "Vous avez été déconnecté avec succès",
+  const handleLogout = async () => {
+    await signOut();
+  };
+
+  const handleProfileEdit = async () => {
+    if (isEditingProfile) {
+      try {
+        await updateProfile({
+          full_name: editForm.full_name,
+        });
+        setIsEditingProfile(false);
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
+    } else {
+      setEditForm({
+        full_name: profile?.full_name || '',
+        email: profile?.email || ''
+      });
+      setIsEditingProfile(true);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
 
-  const handleChangePassword = () => {
-    toast({
-      title: "Changement de mot de passe",
-      description: "Un email de réinitialisation vous a été envoyé",
-    });
-  };
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-xl">Chargement du profil...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -153,9 +177,18 @@ const WithdrawalPage = () => {
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
                     <User className="w-8 h-8 text-white" />
                   </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">{userData.name}</h2>
-                    <p className="text-gray-600">{userData.email}</p>
+                  <div className="flex-1">
+                    {isEditingProfile ? (
+                      <Input
+                        value={editForm.full_name}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
+                        className="text-xl font-semibold text-gray-900 mb-2"
+                        placeholder="Nom complet"
+                      />
+                    ) : (
+                      <h2 className="text-xl font-semibold text-gray-900">{profile.full_name || 'Utilisateur'}</h2>
+                    )}
+                    <p className="text-gray-600">{profile.email}</p>
                   </div>
                 </div>
               </CardHeader>
@@ -177,32 +210,24 @@ const WithdrawalPage = () => {
                     <div className="bg-gray-50 rounded-lg p-4 space-y-3 border border-gray-200">
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">Email: {userData.email}</span>
+                        <span className="text-sm text-gray-700">Email: {profile.email}</span>
                       </div>
                       <div className="text-sm text-gray-700">
-                        Membre depuis: {userData.memberSince}
+                        Membre depuis: {formatDate(profile.created_at)}
                       </div>
                       <div className="text-sm text-gray-700">
-                        Dernière connexion: {userData.lastLogin}
+                        Solde: {new Intl.NumberFormat('fr-FR').format(profile.balance)} FCFA
                       </div>
                     </div>
                   )}
 
                   <Button
-                    onClick={handleChangePassword}
-                    variant="outline"
-                    className="w-full justify-start bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Changer le mot de passe
-                  </Button>
-
-                  <Button
+                    onClick={handleProfileEdit}
                     variant="outline"
                     className="w-full justify-start bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   >
                     <Edit className="w-4 h-4 mr-2" />
-                    Modifier le profil
+                    {isEditingProfile ? 'Sauvegarder' : 'Modifier le profil'}
                   </Button>
 
                   <Button
@@ -282,9 +307,10 @@ const WithdrawalPage = () => {
                     onChange={(e) => setWithdrawalAmount(e.target.value)}
                     className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500"
                     min="4000"
+                    max={profile.balance}
                   />
                   <p className="text-xs text-gray-500">
-                    Montant minimum: 4000 FCFA
+                    Montant minimum: 4000 FCFA | Solde disponible: {new Intl.NumberFormat('fr-FR').format(profile.balance)} FCFA
                   </p>
                 </div>
 

@@ -1,18 +1,23 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
-    name: ''
+    fullName: ''
   });
+
+  const { signIn, signUp } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,9 +27,25 @@ export const AuthPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        await signIn(formData.email, formData.password);
+      } else {
+        if (formData.password !== formData.confirmPassword) {
+          throw new Error('Les mots de passe ne correspondent pas');
+        }
+        await signUp(formData.email, formData.password, formData.fullName);
+        setIsLogin(true); // Switch to login after successful signup
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,16 +67,16 @@ export const AuthPage = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {!isLogin && (
               <div className="space-y-3">
-                <Label htmlFor="name" className="text-white font-semibold text-lg">
+                <Label htmlFor="fullName" className="text-white font-semibold text-lg">
                   Nom complet
                 </Label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 w-6 h-6" />
                   <Input
-                    id="name"
-                    name="name"
+                    id="fullName"
+                    name="fullName"
                     type="text"
-                    value={formData.name}
+                    value={formData.fullName}
                     onChange={handleInputChange}
                     placeholder="Votre nom complet"
                     className="pl-14 h-14 bg-white/25 border-white/40 text-white placeholder:text-white/70 focus:border-yellow-300 focus:ring-yellow-300 text-lg rounded-2xl"
@@ -133,9 +154,10 @@ export const AuthPage = () => {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black font-bold h-14 text-xl rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-yellow-300/50"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black font-bold h-14 text-xl rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-yellow-300/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLogin ? 'Se connecter' : "S'inscrire"}
+              {loading ? 'Chargement...' : (isLogin ? 'Se connecter' : "S'inscrire")}
             </Button>
           </form>
 
