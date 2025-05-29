@@ -127,7 +127,7 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
               
             </div>}
 
-          {currentAvatarUrl && <Button onClick={handleRemoveImage} variant="outline" size="sm" className="bg-white border-red-300 text-red-600 hover:bg-red-50">
+          {currentAvatarUrl && <Button onClick={handleRemoveImage} variant="outline" size="sm" className="border-red-300 text-red-600 bg-fuchsia-400 hover:bg-fuchsia-300">
               <X className="w-4 h-4 mr-2" />
               Supprimer
             </Button>}
