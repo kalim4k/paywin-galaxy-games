@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Trophy, Medal, Award, Coins } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 interface LeaderboardEntry {
   id: string;
@@ -71,11 +72,7 @@ export const Leaderboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-lg">Chargement...</div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (

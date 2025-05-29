@@ -4,6 +4,7 @@ import { Header } from '../components/Header';
 import { Navigation } from '../components/Navigation';
 import { GameSlider } from '../components/GameSlider';
 import { GameGrid } from '../components/GameGrid';
+import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 
 const Index = () => {
   return (
@@ -14,6 +15,7 @@ const Index = () => {
         <GameGrid />
       </main>
       <Navigation />
+      <PWAInstallPrompt />
     </div>
   );
 };

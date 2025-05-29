@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
@@ -9,6 +10,8 @@ import { User, Wallet, CreditCard, Plus, Minus, LogOut, Edit, Eye, EyeOff, Phone
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileImageUpload } from '@/components/ProfileImageUpload';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { supabase } from '@/integrations/supabase/client';
 
 const WithdrawalPage = () => {
@@ -173,11 +176,7 @@ const WithdrawalPage = () => {
   };
 
   if (!profile) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-xl">Chargement du profil...</div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -401,6 +400,7 @@ const WithdrawalPage = () => {
       </div>
 
       <Navigation />
+      <PWAInstallPrompt />
     </div>
   );
 };

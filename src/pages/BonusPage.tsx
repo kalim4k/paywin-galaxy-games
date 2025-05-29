@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gift, Clock, Star } from 'lucide-react';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
 const BonusPage = () => {
   return (
@@ -51,6 +52,7 @@ const BonusPage = () => {
       </div>
 
       <Navigation />
+      <PWAInstallPrompt />
     </div>
   );
 };
