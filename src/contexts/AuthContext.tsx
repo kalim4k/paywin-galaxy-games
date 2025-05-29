@@ -9,6 +9,9 @@ interface Profile {
   email: string;
   full_name: string | null;
   balance: number;
+  avatar_url: string | null;
+  total_withdrawn: number | null;
+  favorite_game: string | null;
   created_at: string;
   updated_at: string;
 }
