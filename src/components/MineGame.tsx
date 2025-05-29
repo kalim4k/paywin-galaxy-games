@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Bomb, Star, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
@@ -41,11 +40,8 @@ export const MineGame = () => {
     const newBoard = Array(25).fill('star');
     const bombPositions = [];
     
-    // Augmenter drastiquement les chances de tomber sur une bombe
-    // en plaçant les bombes de manière plus agressive
-    const totalBombs = Math.max(bombs, Math.floor(25 * 0.4)); // Au moins 40% de bombes
-    
-    while (bombPositions.length < totalBombs) {
+    // Utiliser exactement le nombre de bombes choisi par le joueur
+    while (bombPositions.length < bombs) {
       const pos = Math.floor(Math.random() * 25);
       if (!bombPositions.includes(pos)) {
         bombPositions.push(pos);
