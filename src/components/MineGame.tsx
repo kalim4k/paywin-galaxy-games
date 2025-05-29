@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Bomb, Star, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
@@ -16,6 +17,7 @@ export const MineGame = () => {
   const [gameEnded, setGameEnded] = useState(false);
   const [won, setWon] = useState(false);
   const [revealedStars, setRevealedStars] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Calculer le multiplicateur avec des cotes améliorées basées sur le nombre de bombes
   const calculateMultiplier = (starsFound: number, bombCount: number) => {
@@ -76,110 +78,29 @@ export const MineGame = () => {
     }
   };
 
+  // Algorithme simplifié et plus rapide pour le placement des bombes
   const initializeBoard = () => {
     const newBoard = Array(25).fill('star');
     const bombPositions = [];
     
-    // Algorithme ultra-stratégique pour atteindre 75% de probabilité de perdre
-    // avec EXACTEMENT le nombre de bombes choisi par le joueur
+    // Algorithme simple et rapide : placement aléatoire des bombes
     const totalBombs = bombs;
+    const availablePositions = Array.from({ length: 25 }, (_, i) => i);
     
-    // Stratégie : Identifier les positions les plus probables d'être cliquées
-    // selon les patterns de comportement humain typiques
-    
-    // Zone 1: Positions critiques (coins et bords) - 90% de priorité
-    const criticalPositions = [0, 1, 2, 3, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24];
-    
-    // Zone 2: Centre et positions adjacentes au centre - 80% de priorité  
-    const centerPositions = [6, 7, 8, 11, 12, 13, 16, 17, 18];
-    
-    // Mélanger pour éviter les patterns prévisibles
-    const shuffledCritical = criticalPositions.sort(() => Math.random() - 0.5);
-    const shuffledCenter = centerPositions.sort(() => Math.random() - 0.5);
-    
-    let placedBombs = 0;
-    
-    // Phase 1: Placer 85% des bombes dans les zones critiques
-    const criticalBombCount = Math.floor(totalBombs * 0.85);
-    for (let i = 0; i < Math.min(criticalBombCount, shuffledCritical.length) && placedBombs < totalBombs; i++) {
-      const pos = shuffledCritical[i];
-      // Probabilité très élevée de placement dans ces zones dangereuses
-      if (Math.random() < 0.92) {
-        bombPositions.push(pos);
-        newBoard[pos] = 'bomb';
-        placedBombs++;
-      }
+    // Mélanger les positions disponibles une seule fois
+    for (let i = availablePositions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [availablePositions[i], availablePositions[j]] = [availablePositions[j], availablePositions[i]];
     }
     
-    // Phase 2: Placer le reste dans les zones centrales avec haute probabilité
-    for (let i = 0; i < shuffledCenter.length && placedBombs < totalBombs; i++) {
-      const pos = shuffledCenter[i];
-      if (Math.random() < 0.88) {
-        bombPositions.push(pos);
-        newBoard[pos] = 'bomb';
-        placedBombs++;
-      }
-    }
-    
-    // Phase 3: Si on n'a pas atteint le nombre exact, forcer le placement
-    // sur les positions restantes les plus stratégiques
-    const allPositions = [...shuffledCritical, ...shuffledCenter].filter(pos => !bombPositions.includes(pos));
-    while (placedBombs < totalBombs && allPositions.length > 0) {
-      const randomIndex = Math.floor(Math.random() * allPositions.length);
-      const pos = allPositions[randomIndex];
+    // Prendre les premières positions pour les bombes
+    for (let i = 0; i < totalBombs; i++) {
+      const pos = availablePositions[i];
       bombPositions.push(pos);
       newBoard[pos] = 'bomb';
-      placedBombs++;
-      allPositions.splice(randomIndex, 1);
     }
     
-    // Phase 4: Algorithme de regroupement stratégique
-    // Réorganiser quelques bombes pour créer des "zones de danger" sans ajouter de bombes
-    if (bombPositions.length >= 2) {
-      const clusteredPositions = [];
-      
-      // Identifier les positions adjacentes aux bombes existantes
-      bombPositions.forEach(bombPos => {
-        const row = Math.floor(bombPos / 5);
-        const col = bombPos % 5;
-        
-        for (let dr = -1; dr <= 1; dr++) {
-          for (let dc = -1; dc <= 1; dc++) {
-            const newRow = row + dr;
-            const newCol = col + dc;
-            const newPos = newRow * 5 + newCol;
-            
-            if (newRow >= 0 && newRow < 5 && newCol >= 0 && newCol < 5 && 
-                newPos !== bombPos && !bombPositions.includes(newPos)) {
-              clusteredPositions.push(newPos);
-            }
-          }
-        }
-      });
-      
-      // Déplacer quelques bombes vers des positions de cluster (sans augmenter le total)
-      const uniqueClustered = [...new Set(clusteredPositions)];
-      const bombsToRelocate = Math.min(2, Math.floor(bombPositions.length * 0.3));
-      
-      for (let i = 0; i < bombsToRelocate && uniqueClustered.length > 0; i++) {
-        // Retirer une bombe d'une position moins critique
-        const leastCriticalIndex = bombPositions.findIndex(pos => !criticalPositions.includes(pos));
-        if (leastCriticalIndex !== -1) {
-          const oldPos = bombPositions[leastCriticalIndex];
-          newBoard[oldPos] = 'star';
-          bombPositions.splice(leastCriticalIndex, 1);
-          
-          // La placer dans une position de cluster
-          const clusterIndex = Math.floor(Math.random() * uniqueClustered.length);
-          const newPos = uniqueClustered[clusterIndex];
-          bombPositions.push(newPos);
-          newBoard[newPos] = 'bomb';
-          uniqueClustered.splice(clusterIndex, 1);
-        }
-      }
-    }
-    
-    console.log(`Bombes placées: ${bombPositions.length}/${totalBombs}, Probabilité de perdre estimée: ~75%`);
+    console.log(`Bombes placées: ${bombPositions.length}/${totalBombs}`);
     
     setGameBoard(newBoard);
     setRevealedCells(Array(25).fill(false));
@@ -190,24 +111,30 @@ export const MineGame = () => {
   };
 
   const startGame = async () => {
-    if (!profile) return;
+    if (!profile || isProcessing) return;
 
     if (bet > profile.balance) {
       toast.error('Solde insuffisant pour cette mise');
       return;
     }
 
-    // Déduire la mise du solde immédiatement
-    const newBalance = profile.balance - bet;
-    await updateBalance(
-      newBalance,
-      'game_loss',
-      bet,
-      `Mise au jeu Mine - ${bombs} bombes`
-    );
+    setIsProcessing(true);
 
-    setIsPlaying(true);
-    initializeBoard();
+    try {
+      // Déduire la mise du solde immédiatement
+      const newBalance = profile.balance - bet;
+      await updateBalance(
+        newBalance,
+        'game_loss',
+        bet,
+        `Mise au jeu Mine - ${bombs} bombes`
+      );
+
+      setIsPlaying(true);
+      initializeBoard();
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   // Optimisation: Utiliser useCallback pour éviter les re-rendus
@@ -239,33 +166,40 @@ export const MineGame = () => {
   }, [isPlaying, revealedCells, gameEnded, gameBoard, revealedStars, bombs, bet]);
 
   const cashOut = async () => {
-    if (isPlaying && revealedStars > 0 && profile) {
-      const winnings = Math.floor(bet * currentMultiplier);
-      const netGain = winnings - bet; // Gain net (on a déjà déduit la mise)
-      const newBalance = profile.balance + winnings;
+    if (isPlaying && revealedStars > 0 && profile && !isProcessing) {
+      setIsProcessing(true);
       
-      await updateBalance(
-        newBalance,
-        'game_win',
-        netGain,
-        `Gain au jeu Mine - ${revealedStars} étoiles trouvées`
-      );
-      
-      // Révéler toutes les bombes ET toutes les étoiles quand le joueur récupère ses gains
-      const allRevealed = gameBoard.map(() => true);
-      setRevealedCells(allRevealed);
-      setGameEnded(true);
-      setWon(true);
-      setIsPlaying(false);
-      
-      toast.success(`🎉 Félicitations ! Vous avez gagné ${winnings.toLocaleString()} FCFA !`, {
-        description: `Gain net: +${netGain.toLocaleString()} FCFA`,
-        duration: 5000,
-      });
+      try {
+        const winnings = Math.floor(bet * currentMultiplier);
+        const netGain = winnings - bet; // Gain net (on a déjà déduit la mise)
+        const newBalance = profile.balance + winnings;
+        
+        await updateBalance(
+          newBalance,
+          'game_win',
+          netGain,
+          `Gain au jeu Mine - ${revealedStars} étoiles trouvées`
+        );
+        
+        // Révéler toutes les bombes ET toutes les étoiles quand le joueur récupère ses gains
+        const allRevealed = gameBoard.map(() => true);
+        setRevealedCells(allRevealed);
+        setGameEnded(true);
+        setWon(true);
+        setIsPlaying(false);
+        
+        toast.success(`🎉 Félicitations ! Vous avez gagné ${winnings.toLocaleString()} FCFA !`, {
+          description: `Gain net: +${netGain.toLocaleString()} FCFA`,
+          duration: 5000,
+        });
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
   const resetGame = () => {
+    if (isProcessing) return;
     setIsPlaying(false);
     setGameBoard(Array(25).fill('hidden'));
     setRevealedCells(Array(25).fill(false));
@@ -276,13 +210,13 @@ export const MineGame = () => {
   };
 
   const adjustBet = (amount: number) => {
-    if (!isPlaying) {
+    if (!isPlaying && !isProcessing) {
       setBet(Math.max(200, bet + amount));
     }
   };
 
   const adjustBombs = (amount: number) => {
-    if (!isPlaying) {
+    if (!isPlaying && !isProcessing) {
       setBombs(Math.max(1, Math.min(24, bombs + amount)));
     }
   };
@@ -366,7 +300,7 @@ export const MineGame = () => {
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => adjustBombs(-1)}
-                disabled={bombs <= 1}
+                disabled={bombs <= 1 || isProcessing}
                 className="bg-gray-700/80 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl p-3 transition-colors"
               >
                 <ChevronLeft className="w-5 h-5 text-white" />
@@ -374,7 +308,7 @@ export const MineGame = () => {
               <span className="text-white text-2xl font-bold min-w-[2rem] text-center">{bombs}</span>
               <button
                 onClick={() => adjustBombs(1)}
-                disabled={bombs >= 24}
+                disabled={bombs >= 24 || isProcessing}
                 className="bg-gray-700/80 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl p-3 transition-colors"
               >
                 <ChevronRight className="w-5 h-5 text-white" />
@@ -388,7 +322,7 @@ export const MineGame = () => {
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => adjustBet(-100)}
-                disabled={bet <= 200}
+                disabled={bet <= 200 || isProcessing}
                 className="bg-gray-700/80 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl p-3 transition-colors"
               >
                 <Minus className="w-5 h-5 text-white" />
@@ -396,7 +330,7 @@ export const MineGame = () => {
               <span className="text-white text-2xl font-bold min-w-[4rem] text-center">{bet} FCFA</span>
               <button
                 onClick={() => adjustBet(100)}
-                disabled={bet > profile.balance}
+                disabled={bet > profile.balance || isProcessing}
                 className="bg-gray-700/80 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl p-3 transition-colors"
               >
                 <Plus className="w-5 h-5 text-white" />
@@ -411,19 +345,20 @@ export const MineGame = () => {
         {!isPlaying ? (
           <Button
             onClick={startGame}
-            disabled={bet > profile.balance}
+            disabled={bet > profile.balance || isProcessing}
             className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50"
           >
-            {bet > profile.balance ? 'Solde insuffisant' : 'Jouer'}
+            {isProcessing ? 'Chargement...' : bet > profile.balance ? 'Solde insuffisant' : 'Jouer'}
           </Button>
         ) : (
           <>
             {revealedStars > 0 && !gameEnded && (
               <Button
                 onClick={cashOut}
-                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 text-lg rounded-2xl"
+                disabled={isProcessing}
+                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50"
               >
-                {potentialWin.toFixed(0)} FCFA - Récupérer
+                {isProcessing ? 'Récupération...' : `${potentialWin.toFixed(0)} FCFA - Récupérer`}
               </Button>
             )}
           </>
@@ -436,9 +371,10 @@ export const MineGame = () => {
             </div>
             <Button
               onClick={resetGame}
-              className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 text-lg rounded-2xl"
+              disabled={isProcessing}
+              className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50"
             >
-              Rejouer
+              {isProcessing ? 'Chargement...' : 'Rejouer'}
             </Button>
           </div>
         )}
