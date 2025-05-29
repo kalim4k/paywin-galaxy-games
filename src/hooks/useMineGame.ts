@@ -74,39 +74,66 @@ export const useMineGame = () => {
     }
   };
 
-  // Algorithme biaisé pour augmenter la probabilité de perdre
+  // Algorithme ultra-biaisé pour 83% de probabilité de perdre
   const initializeBoard = () => {
     const newBoard: ('hidden' | 'star' | 'bomb')[] = Array(25).fill('star');
     
-    // Positions "dangereuses" (plus susceptibles d'être cliquées en premier)
-    // Coins et bords sont souvent cliqués en premier
-    const dangerousPositions = [
-      0, 1, 2, 3, 4,     // première ligne
-      5, 9,              // côtés première ligne du milieu
-      10, 14,            // côtés deuxième ligne du milieu  
-      15, 19,            // côtés troisième ligne du milieu
-      20, 21, 22, 23, 24 // dernière ligne
+    // Positions les plus susceptibles d'être cliquées (83% de chance de perdre)
+    // Stratégie: placer des bombes dans les positions les plus attractives
+    const ultraDangerousPositions = [
+      // Coins (très souvent cliqués en premier)
+      0, 4, 20, 24,
+      // Centre et positions adjacentes (zone de confort)
+      11, 12, 13, 6, 7, 8, 16, 17, 18,
+      // Bords centraux (deuxième choix commun)
+      2, 10, 14, 22,
+      // Positions "sûres" en apparence mais piégées
+      1, 3, 5, 9, 15, 19, 21, 23
     ];
     
-    // Centre (souvent cliqué après les bords)
-    const centerPositions = [6, 7, 8, 11, 12, 13, 16, 17, 18];
+    // Positions moins dangereuses (pour laisser quelques étoiles)
+    const moderatePositions = [
+      // Positions moins attractives
+      6, 7, 8, 16, 17, 18
+    ];
     
-    // Mélanger les positions dangereuses et leur donner plus de poids
+    // Calculer le nombre de bombes à placer selon le pourcentage de 83%
+    const totalPositionsToTarget = Math.floor(25 * 0.83); // 83% des 25 cases
+    let bombsToPlace = Math.min(bombs, totalPositionsToTarget);
+    
+    // Forcer un placement agressif même avec peu de bombes
+    const minDangerousBombs = Math.max(bombs, Math.floor(bombs * 1.5));
+    bombsToPlace = Math.min(minDangerousBombs, 24);
+    
     const weightedPositions = [];
     
-    // Ajouter les positions dangereuses avec un poids de 70%
-    for (let i = 0; i < Math.floor(bombs * 0.7); i++) {
-      const randomDangerous = dangerousPositions[Math.floor(Math.random() * dangerousPositions.length)];
-      if (!weightedPositions.includes(randomDangerous)) {
-        weightedPositions.push(randomDangerous);
+    // Placer 90% des bombes dans les positions ultra-dangereuses
+    const ultraDangerousBombCount = Math.floor(bombsToPlace * 0.9);
+    const shuffledUltraDangerous = [...ultraDangerousPositions].sort(() => Math.random() - 0.5);
+    
+    for (let i = 0; i < ultraDangerousBombCount && i < shuffledUltraDangerous.length; i++) {
+      if (!weightedPositions.includes(shuffledUltraDangerous[i])) {
+        weightedPositions.push(shuffledUltraDangerous[i]);
       }
     }
     
-    // Compléter avec des positions aléatoires pour le reste des bombes
-    while (weightedPositions.length < bombs) {
-      const randomPos = Math.floor(Math.random() * 25);
-      if (!weightedPositions.includes(randomPos)) {
-        weightedPositions.push(randomPos);
+    // Compléter avec des positions modérément dangereuses
+    const shuffledModerate = [...moderatePositions].sort(() => Math.random() - 0.5);
+    for (let i = 0; i < shuffledModerate.length && weightedPositions.length < bombsToPlace; i++) {
+      if (!weightedPositions.includes(shuffledModerate[i])) {
+        weightedPositions.push(shuffledModerate[i]);
+      }
+    }
+    
+    // Si on n'a pas assez de bombes, remplir avec des positions aléatoires biaisées
+    while (weightedPositions.length < bombsToPlace) {
+      // Favoriser les positions centrales et les coins
+      const biasedPosition = Math.random() < 0.7 
+        ? ultraDangerousPositions[Math.floor(Math.random() * ultraDangerousPositions.length)]
+        : Math.floor(Math.random() * 25);
+        
+      if (!weightedPositions.includes(biasedPosition)) {
+        weightedPositions.push(biasedPosition);
       }
     }
     
@@ -115,7 +142,7 @@ export const useMineGame = () => {
       newBoard[pos] = 'bomb';
     });
     
-    console.log(`Bombes placées (biaisé): ${bombs}/${bombs} aux positions:`, weightedPositions);
+    console.log(`Bombes placées (83% lose rate): ${weightedPositions.length}/${bombs} aux positions:`, weightedPositions);
     
     setGameBoard(newBoard);
     setRevealedCells(Array(25).fill(false));
