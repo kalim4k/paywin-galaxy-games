@@ -21,6 +21,7 @@ export const MineGame = () => {
     profile,
     potentialWin,
     nextMultipliers,
+    currentLoseProbability,
     startGame,
     handleCellClick,
     cashOut,
@@ -55,6 +56,7 @@ export const MineGame = () => {
         revealedStars={revealedStars}
         bombs={bombs}
         nextMultipliers={nextMultipliers}
+        currentLoseProbability={currentLoseProbability}
         calculateMultiplier={calculateMultiplier}
       />
 
