@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
@@ -6,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { User, Wallet, CreditCard, Plus, Minus, LogOut, Settings, Mail, Edit, Eye, EyeOff, Phone, AtSign } from 'lucide-react';
+import { User, Wallet, CreditCard, Plus, Minus, LogOut, Edit, Eye, EyeOff, Phone, AtSign, TrendingDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { ProfileImageUpload } from '@/components/ProfileImageUpload';
+import { supabase } from '@/integrations/supabase/client';
 
 const WithdrawalPage = () => {
   const { profile, signOut, updateProfile } = useAuth();
@@ -68,7 +69,7 @@ const WithdrawalPage = () => {
     }
   };
 
-  const handleWithdrawal = () => {
+  const handleWithdrawal = async () => {
     const amount = parseFloat(withdrawalAmount);
     if (amount < 4000) {
       toast({
@@ -95,13 +96,21 @@ const WithdrawalPage = () => {
       return;
     }
 
-    toast({
-      title: "Demande de retrait envoyée",
-      description: `Retrait de ${amount} FCFA en cours de traitement`,
-    });
-    setWithdrawalAmount('');
-    setPaymentAddress('');
-    setShowAddressForm(false);
+    try {
+      // Mettre à jour le montant total retiré
+      const newTotalWithdrawn = (profile?.total_withdrawn || 0) + amount;
+      await updateProfile({ total_withdrawn: newTotalWithdrawn });
+
+      toast({
+        title: "Demande de retrait envoyée",
+        description: `Retrait de ${amount} FCFA en cours de traitement`,
+      });
+      setWithdrawalAmount('');
+      setPaymentAddress('');
+      setShowAddressForm(false);
+    } catch (error) {
+      console.error('Erreur lors du retrait:', error);
+    }
   };
 
   const handleDeposit = () => {
@@ -147,6 +156,14 @@ const WithdrawalPage = () => {
     }
   };
 
+  const handleImageUpdate = async (avatarUrl: string) => {
+    try {
+      await updateProfile({ avatar_url: avatarUrl });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'avatar:', error);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       year: 'numeric',
@@ -173,11 +190,15 @@ const WithdrawalPage = () => {
           <div className="lg:col-span-1">
             <Card className="bg-white border border-gray-200 shadow-sm">
               <CardHeader className="pb-4">
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                    <User className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="flex-1">
+                <div className="space-y-4">
+                  {/* Photo de profil */}
+                  <ProfileImageUpload 
+                    currentAvatarUrl={profile.avatar_url}
+                    onImageUpdate={handleImageUpdate}
+                  />
+                  
+                  {/* Informations de base */}
+                  <div>
                     {isEditingProfile ? (
                       <Input
                         value={editForm.full_name}
@@ -208,15 +229,21 @@ const WithdrawalPage = () => {
 
                   {showProfileDetails && (
                     <div className="bg-gray-50 rounded-lg p-4 space-y-3 border border-gray-200">
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">Email: {profile.email}</span>
+                      <div className="text-sm text-gray-700">
+                        Email: {profile.email}
                       </div>
                       <div className="text-sm text-gray-700">
                         Membre depuis: {formatDate(profile.created_at)}
                       </div>
                       <div className="text-sm text-gray-700">
                         Solde: {new Intl.NumberFormat('fr-FR').format(profile.balance)} FCFA
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <TrendingDown className="w-4 h-4 text-red-500" />
+                        Total retiré: {new Intl.NumberFormat('fr-FR').format(profile.total_withdrawn || 0)} FCFA
+                      </div>
+                      <div className="text-sm text-gray-700">
+                        Jeu favori: {profile.favorite_game || 'Mine'}
                       </div>
                     </div>
                   )}

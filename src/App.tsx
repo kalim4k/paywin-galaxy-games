@@ -12,6 +12,7 @@ import AuthPage from "./pages/AuthPage";
 import DicePage from "./pages/DicePage";
 import WithdrawalPage from "./pages/WithdrawalPage";
 import BonusPage from "./pages/BonusPage";
+import LeaderboardPage from "./pages/LeaderboardPage";
 import GameNotAvailablePage from "./pages/GameNotAvailablePage";
 import NotFound from "./pages/NotFound";
 
@@ -49,6 +50,11 @@ const App = () => (
             <Route path="/bonus" element={
               <ProtectedRoute>
                 <BonusPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/leaderboard" element={
+              <ProtectedRoute>
+                <LeaderboardPage />
               </ProtectedRoute>
             } />
             <Route path="/game-not-available/:gameId" element={

@@ -9,29 +9,79 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      game_stats: {
+        Row: {
+          created_at: string
+          game_name: string
+          games_played: number | null
+          id: string
+          total_bet: number | null
+          total_won: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_name: string
+          games_played?: number | null
+          id?: string
+          total_bet?: number | null
+          total_won?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_name?: string
+          games_played?: number | null
+          id?: string
+          total_bet?: number | null
+          total_won?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          avatar_url: string | null
           balance: number
           created_at: string
           email: string
+          favorite_game: string | null
           full_name: string | null
           id: string
+          total_withdrawn: number | null
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           balance?: number
           created_at?: string
           email: string
+          favorite_game?: string | null
           full_name?: string | null
           id: string
+          total_withdrawn?: number | null
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           balance?: number
           created_at?: string
           email?: string
+          favorite_game?: string | null
           full_name?: string | null
           id?: string
+          total_withdrawn?: number | null
           updated_at?: string
         }
         Relationships: []

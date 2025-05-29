@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Gamepad2, Trophy, Gift, CreditCard } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -11,6 +12,7 @@ export const Navigation = () => {
     if (path === '/' || path.includes('mine') || path.includes('dice') || path.includes('game-not-available')) return 'jeux';
     if (path.includes('withdrawal')) return 'retrait';
     if (path.includes('bonus')) return 'bonus';
+    if (path.includes('leaderboard')) return 'classement';
     return 'jeux';
   };
 
@@ -18,7 +20,7 @@ export const Navigation = () => {
 
   const navItems = [
     { id: 'jeux', label: 'Jeux', icon: Gamepad2, path: '/' },
-    { id: 'classement', label: 'Classement', icon: Trophy, path: '/' },
+    { id: 'classement', label: 'Classement', icon: Trophy, path: '/leaderboard' },
     { id: 'bonus', label: 'Bonus', icon: Gift, path: '/bonus' },
     { id: 'retrait', label: 'Retrait', icon: CreditCard, path: '/withdrawal' },
   ];
