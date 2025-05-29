@@ -8,7 +8,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import MinePage from "./pages/MinePage";
-import DynamitPage from "./pages/DynamitPage";
 import AuthPage from "./pages/AuthPage";
 import DicePage from "./pages/DicePage";
 import WithdrawalPage from "./pages/WithdrawalPage";
@@ -36,11 +35,6 @@ const App = () => (
             <Route path="/mine" element={
               <ProtectedRoute>
                 <MinePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/dynamit" element={
-              <ProtectedRoute>
-                <DynamitPage />
               </ProtectedRoute>
             } />
             <Route path="/dice" element={
