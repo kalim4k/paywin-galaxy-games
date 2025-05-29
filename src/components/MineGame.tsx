@@ -80,87 +80,106 @@ export const MineGame = () => {
     const newBoard = Array(25).fill('star');
     const bombPositions = [];
     
-    // Algorithme ultra-agressif pour atteindre 75% de probabilité de perdre
+    // Algorithme ultra-stratégique pour atteindre 75% de probabilité de perdre
+    // avec EXACTEMENT le nombre de bombes choisi par le joueur
     const totalBombs = bombs;
+    
+    // Stratégie : Identifier les positions les plus probables d'être cliquées
+    // selon les patterns de comportement humain typiques
+    
+    // Zone 1: Positions critiques (coins et bords) - 90% de priorité
+    const criticalPositions = [0, 1, 2, 3, 4, 5, 9, 10, 14, 15, 19, 20, 21, 22, 23, 24];
+    
+    // Zone 2: Centre et positions adjacentes au centre - 80% de priorité  
+    const centerPositions = [6, 7, 8, 11, 12, 13, 16, 17, 18];
+    
+    // Mélanger pour éviter les patterns prévisibles
+    const shuffledCritical = criticalPositions.sort(() => Math.random() - 0.5);
+    const shuffledCenter = centerPositions.sort(() => Math.random() - 0.5);
+    
     let placedBombs = 0;
     
-    // Stratégie 1: Identifier les positions les plus probables d'être cliquées en premier
-    // Coins et centre sont souvent cliqués en premier, donc on y place beaucoup de bombes
-    const highPriorityPositions = [0, 1, 2, 3, 4, 5, 9, 10, 12, 14, 15, 19, 20, 21, 22, 23, 24]; // zones populaires étendues
-    const mediumPriorityPositions = [6, 7, 8, 11, 13, 16, 17, 18]; // zones moins populaires
-    
-    // Mélanger les positions prioritaires
-    const shuffledHigh = highPriorityPositions.sort(() => Math.random() - 0.5);
-    const shuffledMedium = mediumPriorityPositions.sort(() => Math.random() - 0.5);
-    
-    // Phase 1: Placer 80% des bombes dans les zones à haute priorité (très agressif)
-    const highPriorityBombCount = Math.ceil(totalBombs * 0.8);
-    for (let i = 0; i < Math.min(highPriorityBombCount, shuffledHigh.length) && placedBombs < totalBombs; i++) {
-      const pos = shuffledHigh[i];
-      if (Math.random() < 0.85) { // 85% de chance de placer une bombe dans ces zones critiques
+    // Phase 1: Placer 85% des bombes dans les zones critiques
+    const criticalBombCount = Math.floor(totalBombs * 0.85);
+    for (let i = 0; i < Math.min(criticalBombCount, shuffledCritical.length) && placedBombs < totalBombs; i++) {
+      const pos = shuffledCritical[i];
+      // Probabilité très élevée de placement dans ces zones dangereuses
+      if (Math.random() < 0.92) {
         bombPositions.push(pos);
         newBoard[pos] = 'bomb';
         placedBombs++;
       }
     }
     
-    // Phase 2: Placer le reste des bombes dans les zones moyennes avec probabilité élevée
-    for (let i = 0; i < shuffledMedium.length && placedBombs < totalBombs; i++) {
-      const pos = shuffledMedium[i];
-      if (Math.random() < 0.75) { // 75% de chance même dans les zones moyennes
+    // Phase 2: Placer le reste dans les zones centrales avec haute probabilité
+    for (let i = 0; i < shuffledCenter.length && placedBombs < totalBombs; i++) {
+      const pos = shuffledCenter[i];
+      if (Math.random() < 0.88) {
         bombPositions.push(pos);
         newBoard[pos] = 'bomb';
         placedBombs++;
       }
     }
     
-    // Phase 3: Si on n'a pas assez de bombes, forcer le placement aléatoirement
-    while (placedBombs < totalBombs) {
-      const pos = Math.floor(Math.random() * 25);
-      if (!bombPositions.includes(pos)) {
-        bombPositions.push(pos);
-        newBoard[pos] = 'bomb';
-        placedBombs++;
-      }
+    // Phase 3: Si on n'a pas atteint le nombre exact, forcer le placement
+    // sur les positions restantes les plus stratégiques
+    const allPositions = [...shuffledCritical, ...shuffledCenter].filter(pos => !bombPositions.includes(pos));
+    while (placedBombs < totalBombs && allPositions.length > 0) {
+      const randomIndex = Math.floor(Math.random() * allPositions.length);
+      const pos = allPositions[randomIndex];
+      bombPositions.push(pos);
+      newBoard[pos] = 'bomb';
+      placedBombs++;
+      allPositions.splice(randomIndex, 1);
     }
     
-    // Phase 4: Algorithme de renforcement - ajouter des bombes supplémentaires aux positions adjacentes
-    // aux bombes existantes pour créer des "clusters" de danger (augmente drastiquement le risque)
-    const adjacentPositions = [];
-    bombPositions.forEach(bombPos => {
-      const row = Math.floor(bombPos / 5);
-      const col = bombPos % 5;
+    // Phase 4: Algorithme de regroupement stratégique
+    // Réorganiser quelques bombes pour créer des "zones de danger" sans ajouter de bombes
+    if (bombPositions.length >= 2) {
+      const clusteredPositions = [];
       
-      // Vérifier toutes les positions adjacentes (8 directions)
-      for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-          const newRow = row + dr;
-          const newCol = col + dc;
-          const newPos = newRow * 5 + newCol;
-          
-          if (newRow >= 0 && newRow < 5 && newCol >= 0 && newCol < 5 && 
-              newPos !== bombPos && !bombPositions.includes(newPos)) {
-            adjacentPositions.push(newPos);
+      // Identifier les positions adjacentes aux bombes existantes
+      bombPositions.forEach(bombPos => {
+        const row = Math.floor(bombPos / 5);
+        const col = bombPos % 5;
+        
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            const newRow = row + dr;
+            const newCol = col + dc;
+            const newPos = newRow * 5 + newCol;
+            
+            if (newRow >= 0 && newRow < 5 && newCol >= 0 && newCol < 5 && 
+                newPos !== bombPos && !bombPositions.includes(newPos)) {
+              clusteredPositions.push(newPos);
+            }
           }
         }
-      }
-    });
-    
-    // Placer des bombes supplémentaires sur 30% des positions adjacentes (stratégie très agressive)
-    const uniqueAdjacent = [...new Set(adjacentPositions)];
-    const additionalBombs = Math.min(Math.floor(uniqueAdjacent.length * 0.3), 25 - bombPositions.length);
-    
-    for (let i = 0; i < additionalBombs; i++) {
-      const randomIndex = Math.floor(Math.random() * uniqueAdjacent.length);
-      const pos = uniqueAdjacent[randomIndex];
-      if (!bombPositions.includes(pos) && Math.random() < 0.6) { // 60% de chance de cluster
-        bombPositions.push(pos);
-        newBoard[pos] = 'bomb';
-        uniqueAdjacent.splice(randomIndex, 1);
+      });
+      
+      // Déplacer quelques bombes vers des positions de cluster (sans augmenter le total)
+      const uniqueClustered = [...new Set(clusteredPositions)];
+      const bombsToRelocate = Math.min(2, Math.floor(bombPositions.length * 0.3));
+      
+      for (let i = 0; i < bombsToRelocate && uniqueClustered.length > 0; i++) {
+        // Retirer une bombe d'une position moins critique
+        const leastCriticalIndex = bombPositions.findIndex(pos => !criticalPositions.includes(pos));
+        if (leastCriticalIndex !== -1) {
+          const oldPos = bombPositions[leastCriticalIndex];
+          newBoard[oldPos] = 'star';
+          bombPositions.splice(leastCriticalIndex, 1);
+          
+          // La placer dans une position de cluster
+          const clusterIndex = Math.floor(Math.random() * uniqueClustered.length);
+          const newPos = uniqueClustered[clusterIndex];
+          bombPositions.push(newPos);
+          newBoard[newPos] = 'bomb';
+          uniqueClustered.splice(clusterIndex, 1);
+        }
       }
     }
     
-    console.log(`Bombes placées: ${bombPositions.length}, Probabilité de perdre estimée: ~75%`);
+    console.log(`Bombes placées: ${bombPositions.length}/${totalBombs}, Probabilité de perdre estimée: ~75%`);
     
     setGameBoard(newBoard);
     setRevealedCells(Array(25).fill(false));
