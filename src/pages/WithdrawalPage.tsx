@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileImageUpload } from '@/components/ProfileImageUpload';
 import { supabase } from '@/integrations/supabase/client';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { usePageTransition } from '@/hooks/usePageTransition';
 
 const WithdrawalPage = () => {
   const { profile, signOut, updateProfile } = useAuth();
@@ -26,6 +28,7 @@ const WithdrawalPage = () => {
     email: profile?.email || ''
   });
   const { toast } = useToast();
+  const { isLoading: pageLoading } = usePageTransition();
 
   const paymentMethods = [
     { id: 'moov', name: 'Moov Money', image: 'https://celinaroom.com/wp-content/uploads/2025/01/Moov_Money_Flooz.png', type: 'mobile' },
@@ -171,6 +174,10 @@ const WithdrawalPage = () => {
       day: 'numeric'
     });
   };
+
+  if (pageLoading) {
+    return <LoadingAnimation />;
+  }
 
   if (!profile) {
     return (

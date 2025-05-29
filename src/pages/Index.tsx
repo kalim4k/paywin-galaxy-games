@@ -1,18 +1,22 @@
 
 import React from 'react';
-import { Header } from '../components/Header';
-import { Navigation } from '../components/Navigation';
-import { GameSlider } from '../components/GameSlider';
-import { GameGrid } from '../components/GameGrid';
+import { Header } from '@/components/Header';
+import { Navigation } from '@/components/Navigation';
+import { GameGrid } from '@/components/GameGrid';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { usePageTransition } from '@/hooks/usePageTransition';
 
 const Index = () => {
+  const { isLoading } = usePageTransition();
+
+  if (isLoading) {
+    return <LoadingAnimation />;
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-black">
       <Header />
-      <main className="pb-20">
-        <GameSlider />
-        <GameGrid />
-      </main>
+      <GameGrid />
       <Navigation />
     </div>
   );

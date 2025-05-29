@@ -1,11 +1,22 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Gift, Clock, Star } from 'lucide-react';
+import { Gift, Clock, Star, CheckCircle, Coins } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { usePageTransition } from '@/hooks/usePageTransition';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
 
 const BonusPage = () => {
+  const { isLoading: pageLoading } = usePageTransition();
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  if (pageLoading) {
+    return <LoadingAnimation />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />

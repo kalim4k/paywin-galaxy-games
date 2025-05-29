@@ -1,33 +1,22 @@
 
 import React from 'react';
-import { Header } from '../components/Header';
-import { Navigation } from '../components/Navigation';
-import { DiceGame } from '../components/DiceGame';
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Header } from '@/components/Header';
+import { Navigation } from '@/components/Navigation';
+import { DiceGame } from '@/components/DiceGame';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { usePageTransition } from '@/hooks/usePageTransition';
 
 const DicePage = () => {
-  const navigate = useNavigate();
+  const { isLoading } = usePageTransition();
+
+  if (isLoading) {
+    return <LoadingAnimation />;
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-black">
       <Header />
-      
-      {/* Back button */}
-      <div className="px-4 py-2">
-        <button 
-          onClick={() => navigate('/')}
-          className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Retour</span>
-        </button>
-      </div>
-
-      <main className="pb-20">
-        <DiceGame />
-      </main>
-      
+      <DiceGame />
       <Navigation />
     </div>
   );
