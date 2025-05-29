@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { User, Wallet, CreditCard, Plus, Minus, LogOut, Settings, Mail, Edit, Eye, EyeOff } from 'lucide-react';
+import { User, Wallet, CreditCard, Plus, Minus, LogOut, Settings, Mail, Edit, Eye, EyeOff, Phone, AtSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const WithdrawalPage = () => {
@@ -28,14 +28,46 @@ const WithdrawalPage = () => {
   };
 
   const paymentMethods = [
-    { id: 'moov', name: 'Moov Money', image: 'https://celinaroom.com/wp-content/uploads/2025/01/Moov_Money_Flooz.png' },
-    { id: 'mtn', name: 'MTN Money', image: 'https://celinaroom.com/wp-content/uploads/2025/01/mtn-1-Copie.jpg' },
-    { id: 'orange', name: 'Orange Money', image: 'https://celinaroom.com/wp-content/uploads/2025/01/Orange-Money-recrute-pour-ce-poste-22-Mars-2023.png' },
-    { id: 'wave', name: 'Wave', image: 'https://celinaroom.com/wp-content/uploads/2025/02/Design-sans-titre4.png' },
-    { id: 'mix', name: 'Mix by Yass', image: 'https://celinaroom.com/wp-content/uploads/2025/05/mixx-by-yas.jpg' },
-    { id: 'paypal', name: 'PayPal', image: 'https://celinaroom.com/wp-content/uploads/2025/01/ENIGME3.png' },
-    { id: 'ton', name: 'TON', image: 'https://celinaroom.com/wp-content/uploads/2025/01/toncoin-ton-logo.png' },
+    { id: 'moov', name: 'Moov Money', image: 'https://celinaroom.com/wp-content/uploads/2025/01/Moov_Money_Flooz.png', type: 'mobile' },
+    { id: 'mtn', name: 'MTN Money', image: 'https://celinaroom.com/wp-content/uploads/2025/01/mtn-1-Copie.jpg', type: 'mobile' },
+    { id: 'orange', name: 'Orange Money', image: 'https://celinaroom.com/wp-content/uploads/2025/01/Orange-Money-recrute-pour-ce-poste-22-Mars-2023.png', type: 'mobile' },
+    { id: 'wave', name: 'Wave', image: 'https://celinaroom.com/wp-content/uploads/2025/02/Design-sans-titre4.png', type: 'mobile' },
+    { id: 'mix', name: 'Mix by Yass', image: 'https://celinaroom.com/wp-content/uploads/2025/05/mixx-by-yas.jpg', type: 'mobile' },
+    { id: 'paypal', name: 'PayPal', image: 'https://celinaroom.com/wp-content/uploads/2025/01/ENIGME3.png', type: 'email' },
+    { id: 'ton', name: 'TON', image: 'https://celinaroom.com/wp-content/uploads/2025/01/toncoin-ton-logo.png', type: 'wallet' },
   ];
+
+  const getPlaceholderText = (methodId: string) => {
+    const method = paymentMethods.find(m => m.id === methodId);
+    if (!method) return 'Entrez votre adresse';
+    
+    switch (method.type) {
+      case 'mobile':
+        return 'Entrez votre numéro de téléphone';
+      case 'email':
+        return 'Entrez votre adresse email';
+      case 'wallet':
+        return 'Entrez votre adresse wallet';
+      default:
+        return 'Entrez votre adresse';
+    }
+  };
+
+  const getInputIcon = (methodId: string) => {
+    const method = paymentMethods.find(m => m.id === methodId);
+    if (!method) return null;
+    
+    switch (method.type) {
+      case 'mobile':
+        return <Phone className="w-4 h-4 text-gray-400" />;
+      case 'email':
+        return <AtSign className="w-4 h-4 text-gray-400" />;
+      case 'wallet':
+        return <Wallet className="w-4 h-4 text-gray-400" />;
+      default:
+        return null;
+    }
+  };
 
   const handleWithdrawal = () => {
     const amount = parseFloat(withdrawalAmount);
@@ -58,7 +90,7 @@ const WithdrawalPage = () => {
     if (!selectedPaymentMethod || !paymentAddress) {
       toast({
         title: "Informations manquantes",
-        description: "Veuillez sélectionner un moyen de paiement et entrer votre adresse",
+        description: "Veuillez sélectionner un moyen de paiement et entrer vos informations",
         variant: "destructive"
       });
       return;
@@ -74,7 +106,7 @@ const WithdrawalPage = () => {
   };
 
   const handleDeposit = () => {
-    window.open('https://odqwetyq.mychariow.com/prd_xoqblm', '_blank');
+    window.open('https://odqwetyq.mychariow.com/prd_xoqblm/checkout', '_blank');
   };
 
   const handleRechargeCode = () => {
@@ -108,20 +140,47 @@ const WithdrawalPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black">
+      {/* Enhanced Header */}
+      <div className="bg-gradient-to-r from-slate-800/80 via-gray-800/80 to-slate-800/80 backdrop-blur-xl border-b border-gray-700/50 shadow-2xl">
+        <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Mon Compte</h1>
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="text-red-600 border-red-200 hover:bg-red-50"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Se déconnecter
-            </Button>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <User className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                  Mon Compte
+                </h1>
+                <p className="text-gray-400 text-sm">Gérez vos finances en toute sécurité</p>
+              </div>
+            </div>
+            
+            {/* Balance Display in Header */}
+            <div className="flex items-center space-x-6">
+              <div className="bg-gradient-to-r from-emerald-500/20 to-green-500/20 backdrop-blur-sm rounded-xl p-4 border border-emerald-400/30">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-emerald-400 to-green-500 rounded-lg flex items-center justify-center">
+                    <Wallet className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-xs uppercase tracking-wider">Solde disponible</p>
+                    <p className="text-2xl font-bold text-white">{balance.toLocaleString()}</p>
+                    <p className="text-emerald-400 text-sm font-medium">FCFA</p>
+                  </div>
+                </div>
+              </div>
+              
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="bg-red-500/10 border-red-400/30 text-red-400 hover:bg-red-500/20 hover:border-red-400/50 backdrop-blur-sm"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Se déconnecter
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -130,53 +189,42 @@ const WithdrawalPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Section */}
           <div className="lg:col-span-1">
-            <Card className="bg-white shadow-sm border border-gray-200">
+            <Card className="bg-slate-800/50 backdrop-blur-xl border-gray-700/50 shadow-2xl">
               <CardHeader className="pb-4">
                 <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
                     <User className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-900">{userData.name}</h2>
-                    <p className="text-gray-500">{userData.email}</p>
+                    <h2 className="text-xl font-semibold text-white">{userData.name}</h2>
+                    <p className="text-gray-400">{userData.email}</p>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Balance Display */}
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Wallet className="w-5 h-5 text-green-600" />
-                    <span className="text-sm font-medium text-green-700">Solde disponible</span>
-                  </div>
-                  <div className="text-2xl font-bold text-green-800 text-center">
-                    {balance.toLocaleString()} FCFA
-                  </div>
-                </div>
-
-                <Separator />
+                <Separator className="bg-gray-700/50" />
 
                 {/* Profile Actions */}
                 <div className="space-y-2">
                   <Button
                     onClick={() => setShowProfileDetails(!showProfileDetails)}
                     variant="outline"
-                    className="w-full justify-start"
+                    className="w-full justify-start bg-slate-700/30 border-gray-600/50 text-gray-300 hover:bg-slate-600/50"
                   >
                     {showProfileDetails ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
                     {showProfileDetails ? 'Masquer les détails' : 'Voir les détails'}
                   </Button>
 
                   {showProfileDetails && (
-                    <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                    <div className="bg-slate-700/30 rounded-lg p-4 space-y-3 border border-gray-600/30">
                       <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-600">Email: {userData.email}</span>
+                        <Mail className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-300">Email: {userData.email}</span>
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-300">
                         Membre depuis: {userData.memberSince}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-300">
                         Dernière connexion: {userData.lastLogin}
                       </div>
                     </div>
@@ -185,7 +233,7 @@ const WithdrawalPage = () => {
                   <Button
                     onClick={handleChangePassword}
                     variant="outline"
-                    className="w-full justify-start"
+                    className="w-full justify-start bg-slate-700/30 border-gray-600/50 text-gray-300 hover:bg-slate-600/50"
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Changer le mot de passe
@@ -193,7 +241,7 @@ const WithdrawalPage = () => {
 
                   <Button
                     variant="outline"
-                    className="w-full justify-start"
+                    className="w-full justify-start bg-slate-700/30 border-gray-600/50 text-gray-300 hover:bg-slate-600/50"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Modifier le profil
@@ -206,9 +254,9 @@ const WithdrawalPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Deposit Section */}
-            <Card className="bg-white shadow-sm border border-gray-200">
+            <Card className="bg-slate-800/50 backdrop-blur-xl border-gray-700/50 shadow-2xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-green-600">
+                <CardTitle className="flex items-center gap-2 text-emerald-400">
                   <Plus className="w-5 h-5" />
                   Dépôt d'argent
                 </CardTitle>
@@ -216,7 +264,7 @@ const WithdrawalPage = () => {
               <CardContent className="space-y-6">
                 <Button 
                   onClick={handleDeposit}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 h-auto"
+                  className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-medium py-3 h-auto shadow-lg"
                 >
                   <CreditCard className="w-5 h-5 mr-2" />
                   Effectuer un dépôt
@@ -224,10 +272,10 @@ const WithdrawalPage = () => {
                 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-200"></div>
+                    <div className="w-full border-t border-gray-600/50"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="bg-white px-3 text-gray-500">ou</span>
+                    <span className="bg-slate-800 px-3 text-gray-400">ou</span>
                   </div>
                 </div>
 
@@ -237,12 +285,12 @@ const WithdrawalPage = () => {
                     placeholder="Code de recharge"
                     value={rechargeCode}
                     onChange={(e) => setRechargeCode(e.target.value)}
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    className="bg-slate-700/30 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-500"
                   />
                   <Button 
                     onClick={handleRechargeCode}
                     variant="outline"
-                    className="w-full border-gray-300 hover:bg-gray-50"
+                    className="w-full bg-slate-700/30 border-gray-600/50 text-gray-300 hover:bg-slate-600/50"
                   >
                     Valider le code
                   </Button>
@@ -251,9 +299,9 @@ const WithdrawalPage = () => {
             </Card>
 
             {/* Withdrawal Section */}
-            <Card className="bg-white shadow-sm border border-gray-200">
+            <Card className="bg-slate-800/50 backdrop-blur-xl border-gray-700/50 shadow-2xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-600">
+                <CardTitle className="flex items-center gap-2 text-red-400">
                   <Minus className="w-5 h-5" />
                   Retrait d'argent
                 </CardTitle>
@@ -265,26 +313,26 @@ const WithdrawalPage = () => {
                     placeholder="Montant à retirer (min: 4000 FCFA)"
                     value={withdrawalAmount}
                     onChange={(e) => setWithdrawalAmount(e.target.value)}
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    className="bg-slate-700/30 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-500"
                     min="4000"
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     Montant minimum: 4000 FCFA
                   </p>
                 </div>
 
                 {/* Payment Methods Grid */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-4">Choisir le moyen de paiement</h3>
+                  <h3 className="text-sm font-medium text-gray-300 mb-4">Choisir le moyen de paiement</h3>
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                     {paymentMethods.map((method) => (
                       <button
                         key={method.id}
                         onClick={() => selectPaymentMethod(method.id)}
-                        className={`p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
+                        className={`p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-lg ${
                           selectedPaymentMethod === method.id
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-blue-500 bg-blue-500/20 shadow-lg shadow-blue-500/25'
+                            : 'border-gray-600/50 hover:border-gray-500/70 bg-slate-700/30'
                         }`}
                       >
                         <img
@@ -292,7 +340,7 @@ const WithdrawalPage = () => {
                           alt={method.name}
                           className="w-10 h-10 mx-auto mb-2 rounded object-cover"
                         />
-                        <p className="text-xs text-center text-gray-600 font-medium">{method.name}</p>
+                        <p className="text-xs text-center text-gray-300 font-medium">{method.name}</p>
                       </button>
                     ))}
                   </div>
@@ -300,24 +348,29 @@ const WithdrawalPage = () => {
 
                 {/* Address Form */}
                 {showAddressForm && selectedPaymentMethod && (
-                  <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="text-sm font-medium text-gray-700">
-                      Adresse pour {paymentMethods.find(m => m.id === selectedPaymentMethod)?.name}
+                  <div className="space-y-3 p-4 bg-slate-700/30 rounded-lg border border-gray-600/30">
+                    <div className="text-sm font-medium text-gray-300">
+                      Informations pour {paymentMethods.find(m => m.id === selectedPaymentMethod)?.name}
                     </div>
-                    <Input
-                      type="text"
-                      placeholder="Entrez votre adresse de retrait"
-                      value={paymentAddress}
-                      onChange={(e) => setPaymentAddress(e.target.value)}
-                      className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        {getInputIcon(selectedPaymentMethod)}
+                      </div>
+                      <Input
+                        type="text"
+                        placeholder={getPlaceholderText(selectedPaymentMethod)}
+                        value={paymentAddress}
+                        onChange={(e) => setPaymentAddress(e.target.value)}
+                        className="bg-slate-600/30 border-gray-500/50 text-white placeholder:text-gray-400 focus:border-blue-500 pl-10"
+                      />
+                    </div>
                   </div>
                 )}
 
                 <Button 
                   onClick={handleWithdrawal}
                   disabled={!withdrawalAmount || !selectedPaymentMethod || !paymentAddress}
-                  className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-medium py-3 h-auto"
+                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-medium py-3 h-auto shadow-lg"
                 >
                   Demander le retrait
                 </Button>
