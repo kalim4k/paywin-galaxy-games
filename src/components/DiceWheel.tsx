@@ -108,12 +108,12 @@ export const DiceWheel = ({ isSpinning, result, onResult }: DiceWheelProps) => {
           </div>
         </div>
 
-        {/* Zone gagnante - plus visible */}
+        {/* Zone gagnante - centrée sur le segment du milieu */}
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-full pointer-events-none">
-          <div className="w-full h-full border-l-4 border-r-4 border-yellow-400 bg-yellow-400/10"></div>
+          <div className="w-full h-full border-l-4 border-r-4 border-yellow-400 bg-yellow-400/20"></div>
         </div>
 
-        {/* Pointer amélioré - pointant vers la zone gagnante */}
+        {/* Pointer pointant vers la zone gagnante */}
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-3">
           <div className="w-0 h-0 border-l-6 border-r-6 border-b-12 border-l-transparent border-r-transparent border-b-yellow-400 drop-shadow-lg"></div>
         </div>

@@ -43,7 +43,7 @@ export const DiceGame = () => {
   const handleResult = (color: 'red' | 'black' | 'blue', number: number) => {
     setGameResult({ color, number });
 
-    // Calculer les gains si le joueur a gagné
+    // Calculer les gains si le joueur a gagné (couleur correspond)
     if (color === selectedColor) {
       const winnings = betAmount * number;
       setBalance(prev => prev + winnings);
