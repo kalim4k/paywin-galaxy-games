@@ -119,7 +119,7 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
 
         <div className="space-y-2">
           {!uploadMethod && <div className="flex flex-col space-y-2">
-              <Button onClick={() => setUploadMethod('file')} variant="outline" size="sm" className="bg-white border-gray-300">
+              <Button onClick={() => setUploadMethod('file')} variant="outline" size="sm" className="border-gray-300 bg-fuchsia-600 hover:bg-fuchsia-500 text-zinc-50">
                 <Smartphone className="w-4 h-4 mr-2" />
                 Depuis le téléphone
               </Button>
