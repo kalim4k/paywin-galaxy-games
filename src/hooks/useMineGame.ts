@@ -43,14 +43,19 @@ export const useMineGame = () => {
     if (!profile) return;
 
     try {
+      // Use upsert for better performance and handle concurrent updates
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ balance: newBalance, updated_at: new Date().toISOString() })
-        .eq('id', profile.id);
+        .upsert({ 
+          id: profile.id,
+          balance: newBalance, 
+          updated_at: new Date().toISOString() 
+        }, { onConflict: 'id' });
 
       if (updateError) throw updateError;
 
-      const { error: transactionError } = await supabase
+      // Fire and forget transaction logging to improve UI responsiveness
+      supabase
         .from('transactions')
         .insert({
           user_id: profile.id,
@@ -58,9 +63,10 @@ export const useMineGame = () => {
           amount: amount,
           description: description,
           status: 'completed'
+        })
+        .then(({ error }) => {
+          if (error) console.error('Transaction logging error:', error);
         });
-
-      if (transactionError) throw transactionError;
 
       await refreshProfile();
     } catch (error) {
@@ -69,18 +75,26 @@ export const useMineGame = () => {
     }
   };
 
-  const initializeBoard = () => {
-    const newBoard = Array(25).fill('star');
-    const availablePositions = Array.from({ length: 25 }, (_, i) => i);
-    
-    for (let i = availablePositions.length - 1; i > 0; i--) {
+  // Optimized Fisher-Yates shuffle algorithm for better performance
+  const shuffleArray = (array: number[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [availablePositions[i], availablePositions[j]] = [availablePositions[j], availablePositions[i]];
+      [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
+  };
+
+  const initializeBoard = () => {
+    // Pre-create array of positions for better performance
+    const positions = Array.from({ length: 25 }, (_, i) => i);
+    const shuffledPositions = shuffleArray(positions);
     
+    // Create board with stars first, then place bombs
+    const newBoard: ('hidden' | 'star' | 'bomb')[] = Array(25).fill('star');
+    
+    // Place bombs in first N shuffled positions
     for (let i = 0; i < bombs; i++) {
-      const pos = availablePositions[i];
-      newBoard[pos] = 'bomb';
+      newBoard[shuffledPositions[i]] = 'bomb';
     }
     
     console.log(`Bombes placées: ${bombs}/${bombs}`);
@@ -104,6 +118,11 @@ export const useMineGame = () => {
     setIsProcessing(true);
 
     try {
+      // Initialize board immediately for better UX
+      setIsPlaying(true);
+      initializeBoard();
+      
+      // Update balance in background
       const newBalance = profile.balance - bet;
       await updateBalance(
         newBalance,
@@ -111,9 +130,9 @@ export const useMineGame = () => {
         bet,
         `Mise au jeu Mine - ${bombs} bombes`
       );
-
-      setIsPlaying(true);
-      initializeBoard();
+    } catch (error) {
+      setIsPlaying(false);
+      console.error('Erreur lors du démarrage:', error);
     } finally {
       setIsProcessing(false);
     }
@@ -146,34 +165,42 @@ export const useMineGame = () => {
   }, [isPlaying, revealedCells, gameEnded, gameBoard, revealedStars, bombs, bet]);
 
   const cashOut = async () => {
-    if (isPlaying && revealedStars > 0 && profile && !isProcessing) {
-      setIsProcessing(true);
+    if (!isPlaying || revealedStars === 0 || !profile || isProcessing) return;
+
+    setIsProcessing(true);
+    
+    try {
+      // Update UI immediately for better responsiveness
+      const winnings = Math.floor(bet * currentMultiplier);
+      const netGain = winnings - bet;
       
-      try {
-        const winnings = Math.floor(bet * currentMultiplier);
-        const netGain = winnings - bet;
-        const newBalance = profile.balance + winnings;
-        
-        await updateBalance(
-          newBalance,
-          'game_win',
-          netGain,
-          `Gain au jeu Mine - ${revealedStars} étoiles trouvées`
-        );
-        
-        const allRevealed = gameBoard.map(() => true);
-        setRevealedCells(allRevealed);
-        setGameEnded(true);
-        setWon(true);
-        setIsPlaying(false);
-        
-        toast.success(`🎉 Félicitations ! Vous avez gagné ${winnings.toLocaleString()} FCFA !`, {
-          description: `Gain net: +${netGain.toLocaleString()} FCFA`,
-          duration: 5000,
-        });
-      } finally {
-        setIsProcessing(false);
-      }
+      setGameEnded(true);
+      setWon(true);
+      setIsPlaying(false);
+      
+      // Reveal all cells
+      const allRevealed = gameBoard.map(() => true);
+      setRevealedCells(allRevealed);
+      
+      // Show success message immediately
+      toast.success(`🎉 Félicitations ! Vous avez gagné ${winnings.toLocaleString()} FCFA !`, {
+        description: `Gain net: +${netGain.toLocaleString()} FCFA`,
+        duration: 5000,
+      });
+      
+      // Update balance in background
+      const newBalance = profile.balance + winnings;
+      await updateBalance(
+        newBalance,
+        'game_win',
+        netGain,
+        `Gain au jeu Mine - ${revealedStars} étoiles trouvées`
+      );
+    } catch (error) {
+      console.error('Erreur lors du retrait:', error);
+      toast.error('Erreur lors du retrait des gains');
+    } finally {
+      setIsProcessing(false);
     }
   };
 

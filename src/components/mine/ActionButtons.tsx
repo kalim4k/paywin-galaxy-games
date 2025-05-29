@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 interface ActionButtonsProps {
   isPlaying: boolean;
@@ -35,9 +36,14 @@ export const ActionButtons = ({
         <Button
           onClick={onStartGame}
           disabled={bet > maxBalance || isProcessing}
-          className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50"
+          className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50 transition-all duration-200"
         >
-          {isProcessing ? 'Chargement...' : bet > maxBalance ? 'Solde insuffisant' : 'Jouer'}
+          {isProcessing ? (
+            <div className="flex items-center space-x-2">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Démarrage...</span>
+            </div>
+          ) : bet > maxBalance ? 'Solde insuffisant' : 'Jouer'}
         </Button>
       ) : (
         <>
@@ -45,9 +51,14 @@ export const ActionButtons = ({
             <Button
               onClick={onCashOut}
               disabled={isProcessing}
-              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50 transition-all duration-200"
             >
-              {isProcessing ? 'Récupération...' : `${potentialWin.toFixed(0)} FCFA - Récupérer`}
+              {isProcessing ? (
+                <div className="flex items-center space-x-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Récupération...</span>
+                </div>
+              ) : `${potentialWin.toFixed(0)} FCFA - Récupérer`}
             </Button>
           )}
         </>
@@ -61,9 +72,14 @@ export const ActionButtons = ({
           <Button
             onClick={onResetGame}
             disabled={isProcessing}
-            className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50 transition-all duration-200"
           >
-            {isProcessing ? 'Chargement...' : 'Rejouer'}
+            {isProcessing ? (
+              <div className="flex items-center space-x-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Chargement...</span>
+              </div>
+            ) : 'Rejouer'}
           </Button>
         </div>
       )}
