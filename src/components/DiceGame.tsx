@@ -9,7 +9,7 @@ export const DiceGame = () => {
   const [selectedColor, setSelectedColor] = useState<'red' | 'black' | 'blue' | null>(null);
   const [betAmount, setBetAmount] = useState(200);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [gameResult, setGameResult] = useState<'red' | 'black' | 'blue' | null>(null);
+  const [gameResult, setGameResult] = useState<{color: 'red' | 'black' | 'blue', number: number} | null>(null);
   const [balance, setBalance] = useState(25750);
 
   const colorMultipliers = {
@@ -31,22 +31,27 @@ export const DiceGame = () => {
     setTimeout(() => {
       // Générer un résultat aléatoire avec probabilités réalistes
       const random = Math.random();
-      let result: 'red' | 'black' | 'blue';
+      let resultColor: 'red' | 'black' | 'blue';
+      let resultNumber: number;
       
       if (random < 0.45) {
-        result = 'red';
+        resultColor = 'red';
+        resultNumber = Math.floor(Math.random() * 8) + 1; // 1-8 pour rouge
       } else if (random < 0.9) {
-        result = 'black';
+        resultColor = 'black';
+        resultNumber = 0; // 0 pour noir
       } else {
-        result = 'blue';
+        resultColor = 'blue';
+        resultNumber = 11; // 11 pour bleu
       }
 
+      const result = { color: resultColor, number: resultNumber };
       setGameResult(result);
       setIsSpinning(false);
 
       // Calculer les gains si le joueur a gagné
-      if (result === selectedColor) {
-        const winnings = betAmount * colorMultipliers[selectedColor];
+      if (result.color === selectedColor) {
+        const winnings = betAmount * result.number;
         setBalance(prev => prev + winnings);
       }
     }, 2000);
@@ -68,7 +73,7 @@ export const DiceGame = () => {
       {/* Dice Wheel */}
       <DiceWheel 
         isSpinning={isSpinning} 
-        result={gameResult}
+        result={gameResult?.color || null}
       />
 
       {/* Bet Options */}
@@ -98,13 +103,13 @@ export const DiceGame = () => {
         {gameResult && (
           <div className="text-center space-y-2">
             <p className="text-white">
-              Résultat: <span className={`font-bold ${gameResult === 'red' ? 'text-red-400' : gameResult === 'black' ? 'text-gray-300' : 'text-blue-400'}`}>
-                {gameResult === 'red' ? 'Rouge' : gameResult === 'black' ? 'Noir' : 'Bleu'}
+              Résultat: <span className={`font-bold ${gameResult.color === 'red' ? 'text-red-400' : gameResult.color === 'black' ? 'text-gray-300' : 'text-blue-400'}`}>
+                {gameResult.color === 'red' ? 'Rouge' : gameResult.color === 'black' ? 'Noir' : 'Bleu'} - {gameResult.number}
               </span>
             </p>
-            {gameResult === selectedColor ? (
+            {gameResult.color === selectedColor ? (
               <p className="text-green-400 font-bold">
-                Vous avez gagné {betAmount * colorMultipliers[selectedColor]} FCFA ! 🎉
+                Vous avez gagné {betAmount * gameResult.number} FCFA ! 🎉
               </p>
             ) : (
               <p className="text-red-400 font-bold">
