@@ -1,0 +1,34 @@
+
+{
+  "name": "PayWin Galaxy Games",
+  "short_name": "PayWin",
+  "description": "Jeux de casino en ligne - Mine, Dice, Crash et plus encore",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "fr",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEirP1RKiKzhdOa1PY9ctyqKFO7iWWDEw3ApFVemufUgktE1Sffo_k0M_vrckbjyxIEWErlGaJ6pXIP_s_heoS-GNAuyXBCGm8UFpfjNRQmkdGIOyAGnl0VKdGr2McUTMC9GBafh0ic3N7oGyqHjLkdlDcltAdkFxknLcTyDJfRd9QQj5B3v6PpaOxUuGbeT/s320/ChatGPT%20Image%2029%20mai%202025,%2013_00_38.png",
+      "sizes": "320x320",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEirP1RKiKzhdOa1PY9ctyqKFO7iWWDEw3ApFVemufUgktE1Sffo_k0M_vrckbjyxIEWErlGaJ6pXIP_s_heoS-GNAuyXBCGm8UFpfjNRQmkdGIOyAGnl0VKdGr2McUTMC9GBafh0ic3N7oGyqHjLkdlDcltAdkFxknLcTyDJfRd9QQj5B3v6PpaOxUuGbeT/s320/ChatGPT%20Image%2029%20mai%202025,%2013_00_38.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEirP1RKiKzhdOa1PY9ctyqKFO7iWWDEw3ApFVemufUgktE1Sffo_k0M_vrckbjyxIEWErlGaJ6pXIP_s_heoS-GNAuyXBCGm8UFpfjNRQmkdGIOyAGnl0VKdGr2McUTMC9GBafh0ic3N7oGyqHjLkdlDcltAdkFxknLcTyDJfRd9QQj5B3v6PpaOxUuGbeT/s320/ChatGPT%20Image%2029%20mai%202025,%2013_00_38.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

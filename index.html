@@ -1,26 +1,75 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>paywin-galaxy-games</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PayWin Galaxy Games</title>
+    <meta name="description" content="Jeux de casino en ligne - Mine, Dice, Crash et plus encore. Gagnez de l'argent en jouant à vos jeux préférés." />
+    <meta name="keywords" content="casino, jeux, mine, dice, crash, argent, gains, mobile" />
+    <meta name="author" content="PayWin Galaxy Games" />
 
-    <meta property="og:title" content="paywin-galaxy-games" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PayWin" />
+    
+    <!-- Icons -->
+    <link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEirP1RKiKzhdOa1PY9ctyqKFO7iWWDEw3ApFVemufUgktE1Sffo_k0M_vrckbjyxIEWErlGaJ6pXIP_s_heoS-GNAuyXBCGm8UFpfjNRQmkdGIOyAGnl0VKdGr2McUTMC9GBafh0ic3N7oGyqHjLkdlDcltAdkFxknLcTyDJfRd9QQj5B3v6PpaOxUuGbeT/s320/ChatGPT%20Image%2029%20mai%202025,%2013_00_38.png" type="image/png" />
+    <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEirP1RKiKzhdOa1PY9ctyqKFO7iWWDEw3ApFVemufUgktE1Sffo_k0M_vrckbjyxIEWErlGaJ6pXIP_s_heoS-GNAuyXBCGm8UFpfjNRQmkdGIOyAGnl0VKdGr2McUTMC9GBafh0ic3N7oGyqHjLkdlDcltAdkFxknLcTyDJfRd9QQj5B3v6PpaOxUuGbeT/s320/ChatGPT%20Image%2029%20mai%202025,%2013_00_38.png" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="PayWin Galaxy Games" />
+    <meta property="og:description" content="Jeux de casino en ligne - Mine, Dice, Crash et plus encore. Gagnez de l'argent en jouant à vos jeux préférés." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEirP1RKiKzhdOa1PY9ctyqKFO7iWWDEw3ApFVemufUgktE1Sffo_k0M_vrckbjyxIEWErlGaJ6pXIP_s_heoS-GNAuyXBCGm8UFpfjNRQmkdGIOyAGnl0VKdGr2McUTMC9GBafh0ic3N7oGyqHjLkdlDcltAdkFxknLcTyDJfRd9QQj5B3v6PpaOxUuGbeT/s320/ChatGPT%20Image%2029%20mai%202025,%2013_00_38.png" />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:title" content="PayWin Galaxy Games" />
+    <meta name="twitter:description" content="Jeux de casino en ligne - Mine, Dice, Crash et plus encore." />
+    <meta name="twitter:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEirP1RKiKzhdOa1PY9ctyqKFO7iWWDEw3ApFVemufUgktE1Sffo_k0M_vrckbjyxIEWErlGaJ6pXIP_s_heoS-GNAuyXBCGm8UFpfjNRQmkdGIOyAGnl0VKdGr2McUTMC9GBafh0ic3N7oGyqHjLkdlDcltAdkFxknLcTyDJfRd9QQj5B3v6PpaOxUuGbeT/s320/ChatGPT%20Image%2029%20mai%202025,%2013_00_38.png" />
   </head>
 
   <body>
+    <noscript>
+      Veuillez activer JavaScript pour utiliser PayWin Galaxy Games et profiter de nos jeux de casino en ligne.
+    </noscript>
     <div id="root"></div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+              console.log('Service Worker enregistré avec succès:', registration.scope);
+            }, function(err) {
+              console.log('Échec de l\'enregistrement du Service Worker:', err);
+            });
+        });
+      }
+
+      // Gestion de l'installation PWA
+      let deferredPrompt;
+      
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Afficher un bouton d'installation personnalisé si souhaité
+        console.log('PWA peut être installée');
+      });
+
+      window.addEventListener('appinstalled', (evt) => {
+        console.log('PWA installée avec succès');
+      });
+    </script>
   </body>
 </html>
