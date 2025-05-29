@@ -76,11 +76,11 @@ export const Leaderboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <Card className="bg-white border border-gray-200 shadow-sm">
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 py-6 pb-20">
+        <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-xl text-center justify-center">
+            <CardTitle className="flex items-center gap-2 text-xl text-center justify-center text-white">
               <Trophy className="w-6 h-6 text-yellow-500" />
               Top 10 des Joueurs
             </CardTitle>
@@ -89,12 +89,12 @@ export const Leaderboard = () => {
             <div className="w-full">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-2 px-2 text-xs font-semibold text-gray-700">Rang</th>
-                    <th className="text-left py-2 px-2 text-xs font-semibold text-gray-700">Joueur</th>
-                    <th className="text-left py-2 px-2 text-xs font-semibold text-gray-700">Jeu</th>
-                    <th className="text-right py-2 px-2 text-xs font-semibold text-gray-700">Solde</th>
-                    <th className="text-right py-2 px-2 text-xs font-semibold text-gray-700">Retiré</th>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left py-2 px-2 text-xs font-semibold text-white/70">Rang</th>
+                    <th className="text-left py-2 px-2 text-xs font-semibold text-white/70">Joueur</th>
+                    <th className="text-left py-2 px-2 text-xs font-semibold text-white/70">Jeu</th>
+                    <th className="text-right py-2 px-2 text-xs font-semibold text-white/70">Solde</th>
+                    <th className="text-right py-2 px-2 text-xs font-semibold text-white/70">Retiré</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -103,8 +103,8 @@ export const Leaderboard = () => {
                     return (
                       <tr
                         key={player.id}
-                        className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                          rank <= 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50' : ''
+                        className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
+                          rank <= 3 ? 'bg-gradient-to-r from-yellow-400/10 to-orange-500/10' : ''
                         }`}
                       >
                         {/* Rang */}
@@ -123,7 +123,7 @@ export const Leaderboard = () => {
                                 {player.full_name?.charAt(0)?.toUpperCase() || 'U'}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="text-xs font-medium text-gray-900 truncate max-w-20">
+                            <div className="text-xs font-medium text-white truncate max-w-20">
                               {player.full_name || 'Anonyme'}
                             </div>
                           </div>
@@ -131,14 +131,14 @@ export const Leaderboard = () => {
 
                         {/* Jeu Favori */}
                         <td className="py-2 px-2">
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
                             {getGameDisplayName(player.favorite_game || 'mine')}
                           </span>
                         </td>
 
                         {/* Solde */}
                         <td className="py-2 px-2 text-right">
-                          <div className="flex items-center justify-end gap-1 text-xs font-bold text-green-600">
+                          <div className="flex items-center justify-end gap-1 text-xs font-bold text-green-400">
                             <Coins className="w-3 h-3" />
                             <span className="truncate">{formatAmount(player.balance)}</span>
                           </div>
@@ -146,7 +146,7 @@ export const Leaderboard = () => {
 
                         {/* Montant Retiré */}
                         <td className="py-2 px-2 text-right">
-                          <div className="text-xs text-gray-600 truncate">
+                          <div className="text-xs text-white/60 truncate">
                             {formatAmount(player.total_withdrawn || 0)}
                           </div>
                         </td>
@@ -157,7 +157,7 @@ export const Leaderboard = () => {
               </table>
 
               {leaderboard.length === 0 && (
-                <div className="text-center py-8 text-gray-500 text-sm">
+                <div className="text-center py-8 text-white/60 text-sm">
                   Aucun joueur trouvé
                 </div>
               )}

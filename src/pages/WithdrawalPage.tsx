@@ -180,14 +180,14 @@ const WithdrawalPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Section */}
           <div className="lg:col-span-1">
-            <Card className="bg-white border border-gray-200 shadow-sm">
+            <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl">
               <CardHeader className="pb-4">
                 <div className="space-y-4">
                   {/* Photo de profil */}
@@ -202,46 +202,46 @@ const WithdrawalPage = () => {
                       <Input
                         value={editForm.full_name}
                         onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
-                        className="text-xl font-semibold text-gray-900 mb-2"
+                        className="text-xl font-semibold text-white mb-2 bg-white/10 border-white/20"
                         placeholder="Nom complet"
                       />
                     ) : (
-                      <h2 className="text-xl font-semibold text-gray-900">{profile.full_name || 'Utilisateur'}</h2>
+                      <h2 className="text-xl font-semibold text-white">{profile.full_name || 'Utilisateur'}</h2>
                     )}
-                    <p className="text-gray-600">{profile.email}</p>
+                    <p className="text-white/70">{profile.email}</p>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Separator className="bg-gray-200" />
+                <Separator className="bg-white/10" />
 
                 {/* Profile Actions */}
                 <div className="space-y-2">
                   <Button
                     onClick={() => setShowProfileDetails(!showProfileDetails)}
                     variant="outline"
-                    className="w-full justify-start bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    className="w-full justify-start bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
                   >
                     {showProfileDetails ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
                     {showProfileDetails ? 'Masquer les détails' : 'Voir les détails'}
                   </Button>
 
                   {showProfileDetails && (
-                    <div className="bg-gray-50 rounded-lg p-4 space-y-3 border border-gray-200">
-                      <div className="text-sm text-gray-700">
+                    <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 space-y-3 border border-white/10">
+                      <div className="text-sm text-white/70">
                         Email: {profile.email}
                       </div>
-                      <div className="text-sm text-gray-700">
+                      <div className="text-sm text-white/70">
                         Membre depuis: {formatDate(profile.created_at)}
                       </div>
-                      <div className="text-sm text-gray-700">
+                      <div className="text-sm text-white/70">
                         Solde: {new Intl.NumberFormat('fr-FR').format(profile.balance)} FCFA
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <TrendingDown className="w-4 h-4 text-red-500" />
+                      <div className="flex items-center gap-2 text-sm text-white/70">
+                        <TrendingDown className="w-4 h-4 text-red-400" />
                         Total retiré: {new Intl.NumberFormat('fr-FR').format(profile.total_withdrawn || 0)} FCFA
                       </div>
-                      <div className="text-sm text-gray-700">
+                      <div className="text-sm text-white/70">
                         Jeu favori: {profile.favorite_game || 'Mine'}
                       </div>
                     </div>
@@ -250,7 +250,7 @@ const WithdrawalPage = () => {
                   <Button
                     onClick={handleProfileEdit}
                     variant="outline"
-                    className="w-full justify-start bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    className="w-full justify-start bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     {isEditingProfile ? 'Sauvegarder' : 'Modifier le profil'}
@@ -259,7 +259,7 @@ const WithdrawalPage = () => {
                   <Button
                     onClick={handleLogout}
                     variant="outline"
-                    className="w-full justify-start bg-white border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-400"
+                    className="w-full justify-start bg-red-500/20 border-red-400/30 text-red-300 hover:bg-red-500/30 hover:text-red-200 hover:border-red-400/50"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Se déconnecter
@@ -272,9 +272,9 @@ const WithdrawalPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Deposit Section */}
-            <Card className="bg-white border border-gray-200 shadow-sm">
+            <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-emerald-600">
+                <CardTitle className="flex items-center gap-2 text-emerald-400">
                   <Plus className="w-5 h-5" />
                   Dépôt d'argent
                 </CardTitle>
@@ -290,10 +290,10 @@ const WithdrawalPage = () => {
                 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
+                    <div className="w-full border-t border-white/20"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="bg-white px-3 text-gray-500">ou</span>
+                    <span className="bg-transparent px-3 text-white/70">ou</span>
                   </div>
                 </div>
 
@@ -303,12 +303,12 @@ const WithdrawalPage = () => {
                     placeholder="Code de recharge"
                     value={rechargeCode}
                     onChange={(e) => setRechargeCode(e.target.value)}
-                    className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400"
                   />
                   <Button 
                     onClick={handleRechargeCode}
                     variant="outline"
-                    className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
                   >
                     Valider le code
                   </Button>
@@ -317,9 +317,9 @@ const WithdrawalPage = () => {
             </Card>
 
             {/* Withdrawal Section */}
-            <Card className="bg-white border border-gray-200 shadow-sm">
+            <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-600">
+                <CardTitle className="flex items-center gap-2 text-red-400">
                   <Minus className="w-5 h-5" />
                   Retrait d'argent
                 </CardTitle>
@@ -331,18 +331,18 @@ const WithdrawalPage = () => {
                     placeholder="Montant à retirer (min: 4000 FCFA)"
                     value={withdrawalAmount}
                     onChange={(e) => setWithdrawalAmount(e.target.value)}
-                    className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400"
                     min="4000"
                     max={profile.balance}
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-white/60">
                     Montant minimum: 4000 FCFA | Solde disponible: {new Intl.NumberFormat('fr-FR').format(profile.balance)} FCFA
                   </p>
                 </div>
 
                 {/* Payment Methods Grid */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-4">Choisir le moyen de paiement</h3>
+                  <h3 className="text-sm font-medium text-white/70 mb-4">Choisir le moyen de paiement</h3>
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                     {paymentMethods.map((method) => (
                       <button
@@ -350,8 +350,8 @@ const WithdrawalPage = () => {
                         onClick={() => selectPaymentMethod(method.id)}
                         className={`p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
                           selectedPaymentMethod === method.id
-                            ? 'border-blue-500 bg-blue-50 shadow-sm'
-                            : 'border-gray-200 hover:border-gray-300 bg-white'
+                            ? 'border-blue-400 bg-blue-500/20 shadow-sm'
+                            : 'border-white/20 hover:border-white/30 bg-white/5'
                         }`}
                       >
                         <img
@@ -359,7 +359,7 @@ const WithdrawalPage = () => {
                           alt={method.name}
                           className="w-10 h-10 mx-auto mb-2 rounded object-cover"
                         />
-                        <p className="text-xs text-center text-gray-700 font-medium">{method.name}</p>
+                        <p className="text-xs text-center text-white font-medium">{method.name}</p>
                       </button>
                     ))}
                   </div>
@@ -367,8 +367,8 @@ const WithdrawalPage = () => {
 
                 {/* Address Form */}
                 {showAddressForm && selectedPaymentMethod && (
-                  <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="text-sm font-medium text-gray-700">
+                  <div className="space-y-3 p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                    <div className="text-sm font-medium text-white/70">
                       Informations pour {paymentMethods.find(m => m.id === selectedPaymentMethod)?.name}
                     </div>
                     <div className="relative">
@@ -380,7 +380,7 @@ const WithdrawalPage = () => {
                         placeholder={getPlaceholderText(selectedPaymentMethod)}
                         value={paymentAddress}
                         onChange={(e) => setPaymentAddress(e.target.value)}
-                        className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 pl-10"
+                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400 pl-10"
                       />
                     </div>
                   </div>
@@ -389,7 +389,7 @@ const WithdrawalPage = () => {
                 <Button 
                   onClick={handleWithdrawal}
                   disabled={!withdrawalAmount || !selectedPaymentMethod || !paymentAddress}
-                  className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:hover:bg-gray-400 text-white font-medium py-3 h-auto shadow-sm"
+                  className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:hover:bg-gray-600 text-white font-medium py-3 h-auto shadow-sm"
                 >
                   Demander le retrait
                 </Button>
