@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,14 +42,14 @@ export const useMineGame = () => {
     if (!profile) return;
 
     try {
-      // Use upsert for better performance and handle concurrent updates
+      // Use update instead of upsert for better performance and correct typing
       const { error: updateError } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: profile.id,
+        .update({ 
           balance: newBalance, 
           updated_at: new Date().toISOString() 
-        }, { onConflict: 'id' });
+        })
+        .eq('id', profile.id);
 
       if (updateError) throw updateError;
 
