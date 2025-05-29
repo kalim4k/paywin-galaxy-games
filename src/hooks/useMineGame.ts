@@ -74,60 +74,99 @@ export const useMineGame = () => {
     }
   };
 
-  // Algorithme ultra-biaisé pour 83% de probabilité de perdre
+  // Algorithme optimisé pour 25% de chance d'avoir 3 étoiles consécutives
   const initializeBoard = () => {
     const newBoard: ('hidden' | 'star' | 'bomb')[] = Array(25).fill('star');
     
-    // Positions les plus susceptibles d'être cliquées (stratégie pour 83% de perte)
-    // Hiérarchisation par ordre de probabilité de clic
-    const ultraDangerousPositions = [
-      // Coins (très souvent cliqués en premier) - priorité absolue
+    // Positions les plus susceptibles d'être cliquées en premier
+    // Hiérarchisées par probabilité de clic
+    const mostLikelyFirstClicks = [
+      // Coins (très souvent cliqués en premier)
       0, 4, 20, 24,
-      // Centre parfait (position la plus "sûre" en apparence)
+      // Centre (position "sûre" en apparence)
       12,
-      // Positions centrales adjacentes (zone de confort)
+      // Positions centrales adjacentes
       11, 13, 7, 17,
-      // Bords centraux (deuxième choix commun)
+      // Bords centraux
       2, 10, 14, 22,
-      // Positions "sûres" en apparence mais stratégiquement piégées
+      // Autres positions stratégiques
       1, 3, 5, 9, 15, 19, 21, 23,
-      // Autres positions centrales
       6, 8, 16, 18
     ];
     
-    // Sélectionner exactement le nombre de bombes choisi par le joueur
-    // mais les placer de manière ultra-biaisée pour maximiser les pertes
-    const bombPositions = [];
-    const shuffledDangerous = [...ultraDangerousPositions];
+    // Calculer les combinaisons de 3 positions consécutives les plus probables
+    const consecutivePatterns = [
+      // Patterns horizontaux les plus courants
+      [0, 1, 2], [1, 2, 3], [2, 3, 4],
+      [10, 11, 12], [11, 12, 13], [12, 13, 14],
+      [20, 21, 22], [21, 22, 23], [22, 23, 24],
+      // Patterns verticaux centraux
+      [2, 7, 12], [7, 12, 17], [12, 17, 22],
+      // Patterns diagonaux
+      [0, 6, 12], [6, 12, 18], [12, 18, 24],
+      [4, 8, 12], [8, 12, 16], [12, 16, 20],
+      // Autres patterns stratégiques
+      [5, 6, 7], [8, 9, 10], [15, 16, 17], [18, 19, 20]
+    ];
     
-    // Mélanger avec un biais vers les premières positions (les plus dangereuses)
-    for (let i = 0; i < shuffledDangerous.length; i++) {
-      const randomIndex = Math.floor(Math.random() * (shuffledDangerous.length - i)) + i;
-      // Biais: 80% de chance de garder les positions les plus dangereuses en premier
-      if (Math.random() > 0.2 || i < 8) {
-        [shuffledDangerous[i], shuffledDangerous[randomIndex]] = [shuffledDangerous[randomIndex], shuffledDangerous[i]];
+    // Trier les patterns par probabilité de clic (basé sur la somme des positions)
+    consecutivePatterns.sort((a, b) => {
+      const scoreA = a.reduce((sum, pos) => sum + (mostLikelyFirstClicks.indexOf(pos) !== -1 ? mostLikelyFirstClicks.indexOf(pos) : 25), 0);
+      const scoreB = b.reduce((sum, pos) => sum + (mostLikelyFirstClicks.indexOf(pos) !== -1 ? mostLikelyFirstClicks.indexOf(pos) : 25), 0);
+      return scoreA - scoreB;
+    });
+    
+    // Pour avoir 25% de chance de 3 étoiles consécutives, on doit piéger 75% des patterns les plus probables
+    const patternsToTrap = Math.ceil(consecutivePatterns.length * 0.75);
+    const trappedPatterns = consecutivePatterns.slice(0, patternsToTrap);
+    
+    // Collecter toutes les positions à piéger
+    const positionsToTrap = new Set<number>();
+    trappedPatterns.forEach(pattern => {
+      // Pour chaque pattern, placer au moins une bombe
+      const randomIndex = Math.floor(Math.random() * pattern.length);
+      positionsToTrap.add(pattern[randomIndex]);
+    });
+    
+    // Ajouter des positions supplémentaires si nécessaire pour atteindre le nombre de bombes
+    const remainingPositions = Array.from({length: 25}, (_, i) => i).filter(i => !positionsToTrap.has(i));
+    
+    // Priorité aux positions les plus susceptibles d'être cliquées
+    const sortedRemaining = remainingPositions.sort((a, b) => {
+      const indexA = mostLikelyFirstClicks.indexOf(a);
+      const indexB = mostLikelyFirstClicks.indexOf(b);
+      return (indexA === -1 ? 100 : indexA) - (indexB === -1 ? 100 : indexB);
+    });
+    
+    // Ajouter des bombes supplémentaires si nécessaire
+    while (positionsToTrap.size < bombs && sortedRemaining.length > 0) {
+      const pos = sortedRemaining.shift();
+      if (pos !== undefined) {
+        positionsToTrap.add(pos);
       }
     }
     
-    // Prendre exactement le nombre de bombes demandé en priorité sur les positions dangereuses
-    for (let i = 0; i < bombs && i < shuffledDangerous.length; i++) {
-      bombPositions.push(shuffledDangerous[i]);
-    }
-    
-    // Si on a encore des bombes à placer (cas improbable), utiliser positions aléatoires
-    while (bombPositions.length < bombs) {
-      const randomPos = Math.floor(Math.random() * 25);
-      if (!bombPositions.includes(randomPos)) {
-        bombPositions.push(randomPos);
-      }
+    // Si on a trop de bombes, retirer les moins stratégiques
+    if (positionsToTrap.size > bombs) {
+      const bombPositions = Array.from(positionsToTrap);
+      bombPositions.sort((a, b) => {
+        const indexA = mostLikelyFirstClicks.indexOf(a);
+        const indexB = mostLikelyFirstClicks.indexOf(b);
+        return (indexB === -1 ? -100 : indexB) - (indexA === -1 ? -100 : indexA);
+      });
+      
+      // Garder seulement le nombre de bombes demandé
+      const finalBombPositions = bombPositions.slice(0, bombs);
+      positionsToTrap.clear();
+      finalBombPositions.forEach(pos => positionsToTrap.add(pos));
     }
     
     // Placer les bombes aux positions sélectionnées
-    bombPositions.forEach(pos => {
+    Array.from(positionsToTrap).forEach(pos => {
       newBoard[pos] = 'bomb';
     });
     
-    console.log(`Bombes placées (83% lose rate): ${bombPositions.length}/${bombs} aux positions:`, bombPositions);
+    console.log(`Bombes placées (25% chance pour 3 étoiles): ${positionsToTrap.size}/${bombs} aux positions:`, Array.from(positionsToTrap));
     
     setGameBoard(newBoard);
     setRevealedCells(Array(25).fill(false));
