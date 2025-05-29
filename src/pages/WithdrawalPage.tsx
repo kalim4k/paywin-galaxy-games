@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -140,50 +140,8 @@ const WithdrawalPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black">
-      {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-slate-800/80 via-gray-800/80 to-slate-800/80 backdrop-blur-xl border-b border-gray-700/50 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <User className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  Mon Compte
-                </h1>
-                <p className="text-gray-400 text-sm">Gérez vos finances en toute sécurité</p>
-              </div>
-            </div>
-            
-            {/* Balance Display in Header */}
-            <div className="flex items-center space-x-6">
-              <div className="bg-gradient-to-r from-emerald-500/20 to-green-500/20 backdrop-blur-sm rounded-xl p-4 border border-emerald-400/30">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-emerald-400 to-green-500 rounded-lg flex items-center justify-center">
-                    <Wallet className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wider">Solde disponible</p>
-                    <p className="text-2xl font-bold text-white">{balance.toLocaleString()}</p>
-                    <p className="text-emerald-400 text-sm font-medium">FCFA</p>
-                  </div>
-                </div>
-              </div>
-              
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="bg-red-500/10 border-red-400/30 text-red-400 hover:bg-red-500/20 hover:border-red-400/50 backdrop-blur-sm"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Se déconnecter
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -245,6 +203,15 @@ const WithdrawalPage = () => {
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Modifier le profil
+                  </Button>
+
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="w-full justify-start bg-red-500/10 border-red-400/30 text-red-400 hover:bg-red-500/20 hover:border-red-400/50"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Se déconnecter
                   </Button>
                 </div>
               </CardContent>
