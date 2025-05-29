@@ -14,9 +14,7 @@ const BonusPage = () => {
   const { profile } = useAuth();
 
   const handleDynamitAccess = () => {
-    if (profile && profile.balance >= 150000) {
-      navigate('/dynamit');
-    }
+    navigate('/dynamit');
   };
 
   return (
@@ -29,8 +27,8 @@ const BonusPage = () => {
           <p className="text-white/70">Découvrez vos bonus et récompenses disponibles</p>
         </div>
 
-        {/* VIP Dynamit Game Access */}
-        {profile && (
+        {/* VIP Dynamit Game Access - Only show if balance >= 150000 */}
+        {profile && profile.balance >= 150000 && (
           <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl mb-6">
             <CardHeader className="text-center pb-4">
               <div className="w-16 h-16 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30">
@@ -52,26 +50,14 @@ const BonusPage = () => {
                 <p className="text-lg text-white font-semibold">
                   Votre solde : {profile.balance.toLocaleString()} FCFA
                 </p>
-                {profile.balance >= 150000 && (
-                  <p className="text-green-400 text-sm mt-2">✅ Accès autorisé</p>
-                )}
-                {profile.balance < 150000 && (
-                  <p className="text-red-400 text-sm mt-2">
-                    ❌ Il vous manque {(150000 - profile.balance).toLocaleString()} FCFA
-                  </p>
-                )}
+                <p className="text-green-400 text-sm mt-2">✅ Accès autorisé</p>
               </div>
 
               <Button 
                 onClick={handleDynamitAccess}
-                disabled={profile.balance < 150000}
-                className={`w-full py-3 text-lg font-bold ${
-                  profile.balance >= 150000 
-                    ? 'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white' 
-                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                }`}
+                className="w-full py-3 text-lg font-bold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
               >
-                {profile.balance >= 150000 ? '🎮 Jouer à Dynamit' : '🔒 Accès VIP Requis'}
+                🎮 Jouer à Dynamit
               </Button>
             </CardContent>
           </Card>
