@@ -74,29 +74,48 @@ export const useMineGame = () => {
     }
   };
 
-  // Optimized Fisher-Yates shuffle algorithm for better performance
-  const shuffleArray = (array: number[]) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  };
-
+  // Algorithme biaisé pour augmenter la probabilité de perdre
   const initializeBoard = () => {
-    // Pre-create array of positions for better performance
-    const positions = Array.from({ length: 25 }, (_, i) => i);
-    const shuffledPositions = shuffleArray(positions);
-    
-    // Create board with stars first, then place bombs
     const newBoard: ('hidden' | 'star' | 'bomb')[] = Array(25).fill('star');
     
-    // Place bombs in first N shuffled positions
-    for (let i = 0; i < bombs; i++) {
-      newBoard[shuffledPositions[i]] = 'bomb';
+    // Positions "dangereuses" (plus susceptibles d'être cliquées en premier)
+    // Coins et bords sont souvent cliqués en premier
+    const dangerousPositions = [
+      0, 1, 2, 3, 4,     // première ligne
+      5, 9,              // côtés première ligne du milieu
+      10, 14,            // côtés deuxième ligne du milieu  
+      15, 19,            // côtés troisième ligne du milieu
+      20, 21, 22, 23, 24 // dernière ligne
+    ];
+    
+    // Centre (souvent cliqué après les bords)
+    const centerPositions = [6, 7, 8, 11, 12, 13, 16, 17, 18];
+    
+    // Mélanger les positions dangereuses et leur donner plus de poids
+    const weightedPositions = [];
+    
+    // Ajouter les positions dangereuses avec un poids de 70%
+    for (let i = 0; i < Math.floor(bombs * 0.7); i++) {
+      const randomDangerous = dangerousPositions[Math.floor(Math.random() * dangerousPositions.length)];
+      if (!weightedPositions.includes(randomDangerous)) {
+        weightedPositions.push(randomDangerous);
+      }
     }
     
-    console.log(`Bombes placées: ${bombs}/${bombs}`);
+    // Compléter avec des positions aléatoires pour le reste des bombes
+    while (weightedPositions.length < bombs) {
+      const randomPos = Math.floor(Math.random() * 25);
+      if (!weightedPositions.includes(randomPos)) {
+        weightedPositions.push(randomPos);
+      }
+    }
+    
+    // Placer les bombes aux positions sélectionnées
+    weightedPositions.forEach(pos => {
+      newBoard[pos] = 'bomb';
+    });
+    
+    console.log(`Bombes placées (biaisé): ${bombs}/${bombs} aux positions:`, weightedPositions);
     
     setGameBoard(newBoard);
     setRevealedCells(Array(25).fill(false));
