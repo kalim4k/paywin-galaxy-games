@@ -9,6 +9,8 @@ import MinePage from "./pages/MinePage";
 import AuthPage from "./pages/AuthPage";
 import DicePage from "./pages/DicePage";
 import WithdrawalPage from "./pages/WithdrawalPage";
+import BonusPage from "./pages/BonusPage";
+import GameNotAvailablePage from "./pages/GameNotAvailablePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/dice" element={<DicePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/withdrawal" element={<WithdrawalPage />} />
+          <Route path="/bonus" element={<BonusPage />} />
+          <Route path="/game-not-available/:gameId" element={<GameNotAvailablePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

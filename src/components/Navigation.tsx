@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Gamepad2, Trophy, Gift, CreditCard } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -9,8 +8,9 @@ export const Navigation = () => {
   
   const getActiveTab = () => {
     const path = location.pathname;
-    if (path === '/' || path.includes('mine') || path.includes('dice')) return 'jeux';
+    if (path === '/' || path.includes('mine') || path.includes('dice') || path.includes('game-not-available')) return 'jeux';
     if (path.includes('withdrawal')) return 'retrait';
+    if (path.includes('bonus')) return 'bonus';
     return 'jeux';
   };
 
@@ -19,7 +19,7 @@ export const Navigation = () => {
   const navItems = [
     { id: 'jeux', label: 'Jeux', icon: Gamepad2, path: '/' },
     { id: 'classement', label: 'Classement', icon: Trophy, path: '/' },
-    { id: 'bonus', label: 'Bonus', icon: Gift, path: '/' },
+    { id: 'bonus', label: 'Bonus', icon: Gift, path: '/bonus' },
     { id: 'retrait', label: 'Retrait', icon: CreditCard, path: '/withdrawal' },
   ];
 

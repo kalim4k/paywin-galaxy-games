@@ -24,7 +24,7 @@ export const GameGrid = () => {
       gradient: 'from-orange-500 to-red-600',
       players: '892',
       trend: '+8%',
-      path: '#'
+      path: '/game-not-available/lucky-jet'
     },
     {
       id: 'dice',
@@ -44,14 +44,12 @@ export const GameGrid = () => {
       gradient: 'from-pink-500 to-purple-600',
       players: '673',
       trend: '+5%',
-      path: '#'
+      path: '/game-not-available/plinko'
     }
   ];
 
   const handleGameClick = (game: typeof games[0]) => {
-    if (game.path !== '#') {
-      navigate(game.path);
-    }
+    navigate(game.path);
   };
 
   return (
