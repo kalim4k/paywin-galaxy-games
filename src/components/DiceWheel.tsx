@@ -61,11 +61,11 @@ export const DiceWheel = ({ isSpinning, result, onResult }: DiceWheelProps) => {
       const winningSegmentData = { color: result, number: winningNumber };
       setWinningSegment(winningSegmentData);
 
-      // Positionner le segment gagnant exactement sous la barre jaune (position 1, index 1)
+      // Définir les segments finaux avec le segment gagnant au centre
       const finalSegments = [
         { color: 'red', number: 3, bgColor: 'bg-red-500' },
-        winningSegmentData, // Position centrale sous la barre
         { color: 'black', number: 0, bgColor: 'bg-gray-800' },
+        winningSegmentData,
         { color: 'red', number: 6, bgColor: 'bg-red-500' }
       ];
       
@@ -95,7 +95,7 @@ export const DiceWheel = ({ isSpinning, result, onResult }: DiceWheelProps) => {
               <div
                 key={`${segment.color}-${segment.number}-${index}`}
                 className={`flex-1 ${segment.bgColor} flex items-center justify-center border-r-2 border-white/20 last:border-r-0 transition-all duration-75 ${
-                  !isSpinning && winningSegment && index === 1 ? 'ring-4 ring-yellow-400 ring-opacity-90 scale-110 z-10' : ''
+                  !isSpinning && winningSegment && index === 2 ? 'ring-4 ring-yellow-400 ring-opacity-90 scale-110 z-10' : ''
                 }`}
               >
                 <span className={`text-white text-3xl font-bold transition-all duration-75 ${
@@ -108,13 +108,13 @@ export const DiceWheel = ({ isSpinning, result, onResult }: DiceWheelProps) => {
           </div>
         </div>
 
-        {/* Barre gagnante unique - centrée sur le deuxième segment */}
-        <div className="absolute top-0 left-1/4 w-24 h-full pointer-events-none">
-          <div className="w-full h-full border-l-4 border-r-4 border-yellow-400 bg-yellow-400/20"></div>
+        {/* Zone gagnante - plus visible */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-full pointer-events-none">
+          <div className="w-full h-full border-l-4 border-r-4 border-yellow-400 bg-yellow-400/10"></div>
         </div>
 
-        {/* Pointer pointant vers la barre gagnante */}
-        <div className="absolute top-0 left-1/4 transform translate-x-12 -translate-y-3">
+        {/* Pointer amélioré - pointant vers la zone gagnante */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-3">
           <div className="w-0 h-0 border-l-6 border-r-6 border-b-12 border-l-transparent border-r-transparent border-b-yellow-400 drop-shadow-lg"></div>
         </div>
 
