@@ -1,9 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Trophy, Medal, Award, Coins } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+
 interface LeaderboardEntry {
   id: string;
   full_name: string;
@@ -12,20 +14,23 @@ interface LeaderboardEntry {
   total_withdrawn: number;
   favorite_game: string;
 }
+
 export const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     fetchLeaderboard();
   }, []);
+
   const fetchLeaderboard = async () => {
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('profiles').select('id, full_name, avatar_url, balance, total_withdrawn, favorite_game').order('balance', {
-        ascending: false
-      }).limit(10);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, balance, total_withdrawn, favorite_game')
+        .order('balance', { ascending: false })
+        .limit(10);
+
       if (error) throw error;
       setLeaderboard(data || []);
     } catch (error) {
@@ -34,6 +39,7 @@ export const Leaderboard = () => {
       setLoading(false);
     }
   };
+
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
@@ -43,15 +49,16 @@ export const Leaderboard = () => {
       case 3:
         return <Award className="w-4 h-4 text-amber-600" />;
       default:
-        return <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
+        return (
+          <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
             <span className="text-xs font-bold text-gray-600">{rank}</span>
-          </div>;
+          </div>
+        );
     }
   };
+
   const getGameDisplayName = (gameName: string) => {
-    const gameNames: {
-      [key: string]: string;
-    } = {
+    const gameNames: { [key: string]: string } = {
       'mine': 'Mine',
       'dice': 'Dice',
       'crash': 'Crash',
@@ -59,13 +66,17 @@ export const Leaderboard = () => {
     };
     return gameNames[gameName] || gameName;
   };
+
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('fr-FR').format(amount);
   };
+
   if (loading) {
     return <LoadingSpinner />;
   }
-  return <div className="min-h-screen">
+
+  return (
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 py-6 pb-20">
         <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl">
           <CardHeader className="pb-4">
@@ -81,15 +92,21 @@ export const Leaderboard = () => {
                   <tr className="border-b border-white/10">
                     <th className="text-left py-2 px-2 text-xs font-semibold text-white/70">Rang</th>
                     <th className="text-left py-2 px-2 text-xs font-semibold text-white/70">Joueur</th>
-                    
+                    <th className="text-left py-2 px-2 text-xs font-semibold text-white/70">Jeu</th>
                     <th className="text-right py-2 px-2 text-xs font-semibold text-white/70">Solde</th>
                     <th className="text-right py-2 px-2 text-xs font-semibold text-white/70">Retiré</th>
                   </tr>
                 </thead>
                 <tbody>
                   {leaderboard.map((player, index) => {
-                  const rank = index + 1;
-                  return <tr key={player.id} className={`border-b border-white/5 hover:bg-white/5 transition-colors ${rank <= 3 ? 'bg-gradient-to-r from-yellow-400/10 to-orange-500/10' : ''}`}>
+                    const rank = index + 1;
+                    return (
+                      <tr
+                        key={player.id}
+                        className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
+                          rank <= 3 ? 'bg-gradient-to-r from-yellow-400/10 to-orange-500/10' : ''
+                        }`}
+                      >
                         {/* Rang */}
                         <td className="py-2 px-2">
                           <div className="flex items-center justify-start">
@@ -113,7 +130,11 @@ export const Leaderboard = () => {
                         </td>
 
                         {/* Jeu Favori */}
-                        
+                        <td className="py-2 px-2">
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                            {getGameDisplayName(player.favorite_game || 'mine')}
+                          </span>
+                        </td>
 
                         {/* Solde */}
                         <td className="py-2 px-2 text-right">
@@ -129,17 +150,21 @@ export const Leaderboard = () => {
                             {formatAmount(player.total_withdrawn || 0)}
                           </div>
                         </td>
-                      </tr>;
-                })}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
 
-              {leaderboard.length === 0 && <div className="text-center py-8 text-white/60 text-sm">
+              {leaderboard.length === 0 && (
+                <div className="text-center py-8 text-white/60 text-sm">
                   Aucun joueur trouvé
-                </div>}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>;
+    </div>
+  );
 };
