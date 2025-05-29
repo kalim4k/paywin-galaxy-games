@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Bomb, Star, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -210,7 +210,8 @@ export const MineGame = () => {
     initializeBoard();
   };
 
-  const handleCellClick = (index: number) => {
+  // Optimisation: Utiliser useCallback pour éviter les re-rendus
+  const handleCellClick = useCallback((index: number) => {
     if (!isPlaying || revealedCells[index] || gameEnded) return;
 
     const newRevealedCells = [...revealedCells];
@@ -235,7 +236,7 @@ export const MineGame = () => {
       const newMultiplier = calculateMultiplier(newStarsFound, bombs);
       setCurrentMultiplier(newMultiplier);
     }
-  };
+  }, [isPlaying, revealedCells, gameEnded, gameBoard, revealedStars, bombs, bet]);
 
   const cashOut = async () => {
     if (isPlaying && revealedStars > 0 && profile) {
@@ -308,16 +309,17 @@ export const MineGame = () => {
               onClick={() => handleCellClick(index)}
               disabled={!isPlaying || revealedCells[index] || gameEnded}
               className={`
-                aspect-square rounded-xl border-2 transition-all duration-200 text-lg font-bold
+                aspect-square rounded-xl border-2 transition-all duration-75 text-lg font-bold
                 ${revealedCells[index] 
                   ? cell === 'bomb' 
                     ? 'bg-red-500 border-red-400 shadow-lg shadow-red-500/30' 
                     : 'bg-yellow-500 border-yellow-400 shadow-lg shadow-yellow-500/30'
-                  : 'bg-blue-500/80 border-blue-400/60 hover:bg-blue-400 hover:border-blue-300 active:scale-95'
+                  : 'bg-blue-500/80 border-blue-400/60 hover:bg-blue-400 hover:border-blue-300 active:scale-95 transform will-change-transform'
                 }
                 ${!isPlaying || gameEnded ? 'opacity-50' : 'hover:shadow-lg hover:shadow-blue-500/20'}
-                flex items-center justify-center
+                flex items-center justify-center select-none touch-manipulation
               `}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               {revealedCells[index] && (
                 <>
