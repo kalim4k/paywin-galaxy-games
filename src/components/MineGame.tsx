@@ -2,8 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Bomb, Star, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/sonner';
 
 export const MineGame = () => {
+  const { profile, refreshProfile } = useAuth();
   const [bet, setBet] = useState(200);
   const [bombs, setBombs] = useState(3);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -40,16 +44,70 @@ export const MineGame = () => {
     return multipliers;
   };
 
+  const updateBalance = async (newBalance: number, transactionType: 'game_win' | 'game_loss', amount: number, description: string) => {
+    if (!profile) return;
+
+    try {
+      // Mettre à jour le solde dans la base de données
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ balance: newBalance, updated_at: new Date().toISOString() })
+        .eq('id', profile.id);
+
+      if (updateError) throw updateError;
+
+      // Créer une transaction dans l'historique
+      const { error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: profile.id,
+          type: transactionType,
+          amount: amount,
+          description: description,
+          status: 'completed'
+        });
+
+      if (transactionError) throw transactionError;
+
+      // Rafraîchir le profil pour mettre à jour l'interface
+      await refreshProfile();
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du solde:', error);
+      toast.error('Erreur lors de la mise à jour du solde');
+    }
+  };
+
   const initializeBoard = () => {
     const newBoard = Array(25).fill('star');
     const bombPositions = [];
     
-    // Utiliser exactement le nombre de bombes choisi par le joueur
-    while (bombPositions.length < bombs) {
+    // Algorithme amélioré pour augmenter les probabilités de perdre
+    // Au lieu de placer les bombes complètement au hasard, on utilise une stratégie plus agressive
+    const totalBombs = bombs;
+    let placedBombs = 0;
+    
+    // Première phase : placer quelques bombes dans les zones "populaires" (coins et centre)
+    const popularPositions = [0, 4, 10, 12, 14, 20, 24]; // coins et positions centrales
+    const shuffledPopular = popularPositions.sort(() => Math.random() - 0.5);
+    
+    // Placer 40% des bombes dans les zones populaires (augmente la probabilité de les toucher)
+    const popularBombCount = Math.ceil(totalBombs * 0.4);
+    for (let i = 0; i < popularBombCount && i < shuffledPopular.length && placedBombs < totalBombs; i++) {
+      const pos = shuffledPopular[i];
+      if (Math.random() < 0.7) { // 70% de chance de placer une bombe dans ces zones
+        bombPositions.push(pos);
+        newBoard[pos] = 'bomb';
+        placedBombs++;
+      }
+    }
+    
+    // Deuxième phase : placer le reste des bombes aléatoirement
+    while (placedBombs < totalBombs) {
       const pos = Math.floor(Math.random() * 25);
       if (!bombPositions.includes(pos)) {
         bombPositions.push(pos);
         newBoard[pos] = 'bomb';
+        placedBombs++;
       }
     }
     
@@ -61,7 +119,23 @@ export const MineGame = () => {
     setRevealedStars(0);
   };
 
-  const startGame = () => {
+  const startGame = async () => {
+    if (!profile) return;
+
+    if (bet > profile.balance) {
+      toast.error('Solde insuffisant pour cette mise');
+      return;
+    }
+
+    // Déduire la mise du solde immédiatement
+    const newBalance = profile.balance - bet;
+    await updateBalance(
+      newBalance,
+      'game_loss',
+      bet,
+      `Mise au jeu Mine - ${bombs} bombes`
+    );
+
     setIsPlaying(true);
     initializeBoard();
   };
@@ -79,6 +153,12 @@ export const MineGame = () => {
       setRevealedCells(allRevealed);
       setGameEnded(true);
       setWon(false);
+      setIsPlaying(false);
+      
+      toast.error(`💥 Boom ! Vous avez touché une bombe !`, {
+        description: `Vous avez perdu ${bet.toLocaleString()} FCFA`,
+        duration: 5000,
+      });
     } else {
       const newStarsFound = revealedStars + 1;
       setRevealedStars(newStarsFound);
@@ -87,14 +167,30 @@ export const MineGame = () => {
     }
   };
 
-  const cashOut = () => {
-    if (isPlaying && revealedStars > 0) {
+  const cashOut = async () => {
+    if (isPlaying && revealedStars > 0 && profile) {
+      const winnings = Math.floor(bet * currentMultiplier);
+      const netGain = winnings - bet; // Gain net (on a déjà déduit la mise)
+      const newBalance = profile.balance + winnings;
+      
+      await updateBalance(
+        newBalance,
+        'game_win',
+        netGain,
+        `Gain au jeu Mine - ${revealedStars} étoiles trouvées`
+      );
+      
       // Révéler toutes les bombes ET toutes les étoiles quand le joueur récupère ses gains
       const allRevealed = gameBoard.map(() => true);
       setRevealedCells(allRevealed);
       setGameEnded(true);
       setWon(true);
       setIsPlaying(false);
+      
+      toast.success(`🎉 Félicitations ! Vous avez gagné ${winnings.toLocaleString()} FCFA !`, {
+        description: `Gain net: +${netGain.toLocaleString()} FCFA`,
+        duration: 5000,
+      });
     }
   };
 
@@ -122,6 +218,14 @@ export const MineGame = () => {
 
   const potentialWin = bet * currentMultiplier;
   const nextMultipliers = getNextMultipliers();
+
+  if (!profile) {
+    return (
+      <div className="px-4 py-6 text-center">
+        <p className="text-white">Chargement du profil...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-2">
@@ -220,7 +324,8 @@ export const MineGame = () => {
               <span className="text-white text-2xl font-bold min-w-[4rem] text-center">{bet} FCFA</span>
               <button
                 onClick={() => adjustBet(100)}
-                className="bg-gray-700/80 hover:bg-gray-600 rounded-xl p-3 transition-colors"
+                disabled={bet > profile.balance}
+                className="bg-gray-700/80 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl p-3 transition-colors"
               >
                 <Plus className="w-5 h-5 text-white" />
               </button>
@@ -234,9 +339,10 @@ export const MineGame = () => {
         {!isPlaying ? (
           <Button
             onClick={startGame}
-            className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold py-4 text-lg rounded-2xl"
+            disabled={bet > profile.balance}
+            className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold py-4 text-lg rounded-2xl disabled:opacity-50"
           >
-            Jouer
+            {bet > profile.balance ? 'Solde insuffisant' : 'Jouer'}
           </Button>
         ) : (
           <>
