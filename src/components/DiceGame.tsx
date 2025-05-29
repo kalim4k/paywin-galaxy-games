@@ -4,6 +4,7 @@ import { DiceWheel } from './DiceWheel';
 import { DiceBetOptions } from './DiceBetOptions';
 import { DiceBetControls } from './DiceBetControls';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/sonner';
 
 export const DiceGame = () => {
   const [selectedColor, setSelectedColor] = useState<'red' | 'black' | 'blue' | null>(null);
@@ -53,13 +54,20 @@ export const DiceGame = () => {
       if (result.color === selectedColor) {
         const winnings = betAmount * result.number;
         setBalance(prev => prev + winnings);
+        
+        // Notification de victoire
+        toast.success(`🎉 Félicitations ! Vous avez gagné ${winnings.toLocaleString()} FCFA !`, {
+          description: `Résultat: ${result.color === 'red' ? 'Rouge' : result.color === 'black' ? 'Noir' : 'Bleu'} - ${result.number}`,
+          duration: 5000,
+        });
+      } else {
+        // Notification de perte
+        toast.error(`😢 Dommage ! Vous avez perdu ${betAmount.toLocaleString()} FCFA`, {
+          description: `Résultat: ${result.color === 'red' ? 'Rouge' : result.color === 'black' ? 'Noir' : 'Bleu'} - ${result.number}`,
+          duration: 5000,
+        });
       }
     }, 2000);
-  };
-
-  const resetGame = () => {
-    setSelectedColor(null);
-    setGameResult(null);
   };
 
   return (
@@ -81,6 +89,7 @@ export const DiceGame = () => {
         selectedColor={selectedColor}
         onColorSelect={setSelectedColor}
         multipliers={colorMultipliers}
+        isDisabled={isSpinning}
       />
 
       {/* Bet Controls */}
@@ -88,6 +97,7 @@ export const DiceGame = () => {
         betAmount={betAmount}
         onBetChange={setBetAmount}
         balance={balance}
+        isDisabled={isSpinning}
       />
 
       {/* Play Button */}
@@ -99,32 +109,6 @@ export const DiceGame = () => {
         >
           {isSpinning ? 'Rotation en cours...' : 'JOUER'}
         </Button>
-
-        {gameResult && (
-          <div className="text-center space-y-2">
-            <p className="text-white">
-              Résultat: <span className={`font-bold ${gameResult.color === 'red' ? 'text-red-400' : gameResult.color === 'black' ? 'text-gray-300' : 'text-blue-400'}`}>
-                {gameResult.color === 'red' ? 'Rouge' : gameResult.color === 'black' ? 'Noir' : 'Bleu'} - {gameResult.number}
-              </span>
-            </p>
-            {gameResult.color === selectedColor ? (
-              <p className="text-green-400 font-bold">
-                Vous avez gagné {betAmount * gameResult.number} FCFA ! 🎉
-              </p>
-            ) : (
-              <p className="text-red-400 font-bold">
-                Vous avez perdu {betAmount} FCFA 😢
-              </p>
-            )}
-            <Button 
-              onClick={resetGame}
-              variant="outline"
-              className="mt-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
-            >
-              Rejouer
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );

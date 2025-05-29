@@ -9,9 +9,10 @@ interface DiceBetOptionsProps {
     black: number;
     blue: number;
   };
+  isDisabled?: boolean;
 }
 
-export const DiceBetOptions = ({ selectedColor, onColorSelect }: DiceBetOptionsProps) => {
+export const DiceBetOptions = ({ selectedColor, onColorSelect, isDisabled = false }: DiceBetOptionsProps) => {
   const options = [
     { 
       color: 'red' as const, 
@@ -40,15 +41,17 @@ export const DiceBetOptions = ({ selectedColor, onColorSelect }: DiceBetOptionsP
         {options.map((option) => (
           <button
             key={option.color}
-            onClick={() => onColorSelect(option.color)}
+            onClick={() => !isDisabled && onColorSelect(option.color)}
+            disabled={isDisabled}
             className={`
-              ${option.bgColor} ${option.hoverColor}
+              ${option.bgColor} ${!isDisabled ? option.hoverColor : ''}
               text-white p-4 rounded-xl font-bold text-lg
               border-2 transition-all duration-200
               ${selectedColor === option.color 
                 ? 'border-yellow-400 ring-2 ring-yellow-400/50 scale-105' 
                 : 'border-white/20 hover:border-white/40'
               }
+              ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
           >
             <div className="text-center">

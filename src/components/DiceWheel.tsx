@@ -61,22 +61,16 @@ export const DiceWheel = ({ isSpinning, result }: DiceWheelProps) => {
     };
   }, [isSpinning, result]);
 
-  const getWinningSegment = () => {
-    return currentSegments[2]; // Case du milieu (index 2)
-  };
-
   return (
-    <div className="flex justify-center">
-      <div className="relative">
-        {/* Wheel container */}
-        <div className="w-80 h-20 bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+    <div className="flex justify-center w-full">
+      <div className="relative w-full">
+        {/* Wheel container - étendu sur toute la largeur */}
+        <div className="w-full h-20 bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
           <div className={`flex h-full transition-transform duration-75 ${isSpinning ? 'animate-pulse' : ''}`}>
             {currentSegments.map((segment, index) => (
               <div
                 key={`${segment.color}-${segment.number}-${index}`}
-                className={`flex-1 ${segment.bgColor} flex items-center justify-center border-r-2 border-white/20 last:border-r-0 transition-all duration-75 ${
-                  !isSpinning && result && index === 2 ? 'ring-4 ring-yellow-400 ring-opacity-70' : ''
-                }`}
+                className={`flex-1 ${segment.bgColor} flex items-center justify-center border-r-2 border-white/20 last:border-r-0 transition-all duration-75`}
               >
                 <span className={`text-white text-2xl font-bold transition-all duration-75 ${
                   isSpinning ? 'blur-sm' : ''
