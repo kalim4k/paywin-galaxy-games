@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const GameSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   const slides = [
     {
@@ -11,28 +13,32 @@ export const GameSlider = () => {
       title: "MINE",
       subtitle: "Trouvez les diamants cachés",
       gradient: "from-blue-500 to-purple-600",
-      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-4.png"
+      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-4.png",
+      path: "/mine"
     },
     {
       id: 2,
       title: "LUCKY JET",
       subtitle: "Montez jusqu'aux étoiles",
       gradient: "from-orange-500 to-red-600", 
-      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-2.png"
+      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-2.png",
+      path: "/game-not-available/lucky-jet"
     },
     {
       id: 3,
       title: "DICE",
       subtitle: "Lancez les dés de la fortune",
       gradient: "from-green-500 to-emerald-600",
-      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-1.png"
+      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-1.png",
+      path: "/dice"
     },
     {
       id: 4,
       title: "PLINKO",
       subtitle: "Faites tomber la balle gagnante",
       gradient: "from-pink-500 to-violet-600",
-      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-3.png"
+      image: "https://orawin.fun/wp-content/uploads/2025/05/MAGIC-3.png",
+      path: "/game-not-available/plinko"
     }
   ];
 
@@ -51,6 +57,10 @@ export const GameSlider = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  const handlePlayNow = () => {
+    navigate(slides[currentSlide].path);
+  };
+
   return (
     <div className="px-4 py-6">
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-800 to-gray-900 h-48">
@@ -66,7 +76,10 @@ export const GameSlider = () => {
               <div className="z-10">
                 <h3 className="text-white text-2xl font-bold mb-2">{slide.title}</h3>
                 <p className="text-white/90 text-sm mb-4">{slide.subtitle}</p>
-                <button className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full font-medium hover:bg-white/30 transition-all">
+                <button 
+                  onClick={handlePlayNow}
+                  className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full font-medium hover:bg-white/30 transition-all"
+                >
                   Jouer maintenant
                 </button>
               </div>
