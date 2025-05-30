@@ -21,6 +21,9 @@ export const RobGame = () => {
     profile,
     potentialWin,
     nextMultipliers,
+    countdown,
+    showingBombs,
+    bombPositions,
     startGame,
     handleCellClick,
     cashOut,
@@ -40,12 +43,37 @@ export const RobGame = () => {
 
   return (
     <div className="px-4 py-2">
+      {/* Overlay pour le compte à rebours et la révélation des bombes */}
+      {(countdown > 0 || showingBombs) && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center">
+          <div className="text-center">
+            {countdown > 0 ? (
+              <>
+                <div className="text-6xl font-bold text-white mb-4 animate-pulse">
+                  {countdown}
+                </div>
+                <p className="text-white text-xl">Révélation des bombes dans...</p>
+              </>
+            ) : showingBombs ? (
+              <>
+                <div className="text-4xl font-bold text-red-500 mb-4 animate-pulse">
+                  💣 BOMBES RÉVÉLÉES 💣
+                </div>
+                <p className="text-white text-lg">Mémorisez bien leurs positions !</p>
+              </>
+            ) : null}
+          </div>
+        </div>
+      )}
+
       <GameBoard
         gameBoard={gameBoard}
         revealedCells={revealedCells}
         isPlaying={isPlaying}
         gameEnded={gameEnded}
         onCellClick={handleCellClick}
+        showingBombs={showingBombs}
+        bombPositions={bombPositions}
       />
 
       <GameStats

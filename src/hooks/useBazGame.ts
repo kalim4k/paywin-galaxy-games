@@ -7,9 +7,9 @@ import {
   calculateMultiplier, 
   getNextMultipliers, 
   initializeGameBoard,
-  shouldPlaceBomb,
+  shouldPlaceBazBomb,
   fillRemainingBombs
-} from '@/utils/mineGameUtils';
+} from '@/utils/bazGameUtils';
 
 export const useBazGame = () => {
   const { profile, updateBalance } = useGameBalance();
@@ -86,7 +86,8 @@ export const useBazGame = () => {
     newRevealedCells[index] = true;
     setRevealedCells(newRevealedCells);
 
-    const shouldBeBomb = shouldPlaceBomb(revealedStars, bombsPlaced, bombs, revealedCells);
+    // Utiliser la logique Baz avec probabilités très favorables
+    const shouldBeBomb = shouldPlaceBazBomb(revealedStars, bombsPlaced, bombs, revealedCells);
     
     const newBoard = [...gameBoard];
     
@@ -114,7 +115,7 @@ export const useBazGame = () => {
       const newMultiplier = calculateMultiplier(newStarsFound, bombs);
       setCurrentMultiplier(newMultiplier);
       
-      console.log(`Étoile trouvée ! Total: ${newStarsFound}, Bombes placées: ${bombsPlaced}/${bombs}`);
+      console.log(`Étoile trouvée dans Baz ! Total: ${newStarsFound}, Bombes placées: ${bombsPlaced}/${bombs}`);
     }
   }, [isPlaying, revealedCells, gameEnded, gameBoard, revealedStars, bombs, bet, bombsPlaced]);
 
