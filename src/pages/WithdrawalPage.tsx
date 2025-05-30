@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { User, Wallet, CreditCard, Plus, Minus, LogOut, Edit, Eye, EyeOff, Phone, AtSign, TrendingDown } from 'lucide-react';
+import { User, Wallet, CreditCard, Plus, Minus, LogOut, Edit, Eye, EyeOff, Phone, AtSign, TrendingDown, Calendar, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileImageUpload } from '@/components/ProfileImageUpload';
@@ -186,98 +186,89 @@ const WithdrawalPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Section */}
           <div className="lg:col-span-1">
-            <Card className="bg-gradient-to-br from-black/30 via-purple-900/20 to-black/30 backdrop-blur-xl border border-purple-500/20 shadow-2xl shadow-purple-500/10 hover:shadow-purple-500/20 transition-all duration-300">
-              <CardHeader className="pb-6 relative overflow-hidden">
-                {/* Animated background gradient */}
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-purple-600/10 animate-pulse"></div>
-                
-                <div className="relative space-y-6">
-                  {/* Photo de profil avec effet glow */}
-                  <div className="flex justify-center">
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
-                      <ProfileImageUpload 
-                        currentAvatarUrl={profile.avatar_url}
-                        onImageUpdate={handleImageUpdate}
-                      />
-                    </div>
-                  </div>
+            <Card className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+              <CardHeader className="pb-6">
+                <div className="flex flex-col items-center space-y-4">
+                  {/* Photo de profil */}
+                  <ProfileImageUpload 
+                    currentAvatarUrl={profile.avatar_url}
+                    onImageUpdate={handleImageUpdate}
+                  />
                   
-                  {/* Informations de base avec design futuriste */}
-                  <div className="text-center space-y-3">
+                  {/* Nom et email */}
+                  <div className="text-center space-y-2 w-full">
                     {isEditingProfile ? (
                       <Input
                         value={editForm.full_name}
                         onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
-                        className="text-xl font-bold text-center bg-white/5 border-purple-400/30 text-white placeholder:text-white/50 focus:border-purple-400 focus:ring-purple-400/20 backdrop-blur-sm"
+                        className="text-lg font-semibold text-center bg-white/20 border-white/30 text-white placeholder:text-white/70"
                         placeholder="Nom complet"
                       />
                     ) : (
-                      <h2 className="text-2xl font-bold bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                      <h2 className="text-xl font-semibold text-white">
                         {profile.full_name || 'Utilisateur'}
                       </h2>
                     )}
-                    <p className="text-purple-200/80 text-sm font-medium">{profile.email}</p>
-                    
-                    {/* Balance display with glow effect */}
-                    <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-xl p-4 border border-emerald-400/30 backdrop-blur-sm">
-                      <p className="text-xs text-emerald-200/70 mb-1">Solde disponible</p>
-                      <p className="text-2xl font-bold text-emerald-300 drop-shadow-lg">
-                        {new Intl.NumberFormat('fr-FR').format(profile.balance)} FCFA
-                      </p>
-                    </div>
+                    <p className="text-white/70 text-sm">{profile.email}</p>
+                  </div>
+
+                  {/* Balance */}
+                  <div className="bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 rounded-lg p-4 w-full border border-emerald-400/30">
+                    <p className="text-xs text-emerald-200 text-center mb-1">Solde disponible</p>
+                    <p className="text-2xl font-bold text-emerald-300 text-center">
+                      {new Intl.NumberFormat('fr-FR').format(profile.balance)} FCFA
+                    </p>
                   </div>
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-4 relative">
-                {/* Séparateur avec gradient */}
-                <div className="h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
+              <CardContent className="space-y-4">
+                <Separator className="bg-white/20" />
 
-                {/* Profile Actions avec design futuriste */}
+                {/* Actions du profil */}
                 <div className="space-y-3">
                   <Button
                     onClick={() => setShowProfileDetails(!showProfileDetails)}
                     variant="outline"
-                    className="w-full justify-start bg-gradient-to-r from-white/5 to-white/10 border-purple-400/30 text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-400/50 transition-all duration-300 backdrop-blur-sm group"
+                    className="w-full justify-start bg-white/10 border-white/20 text-white hover:bg-white/20"
                   >
-                    {showProfileDetails ? <EyeOff className="w-4 h-4 mr-3 group-hover:scale-110 transition-transform" /> : <Eye className="w-4 h-4 mr-3 group-hover:scale-110 transition-transform" />}
+                    {showProfileDetails ? <EyeOff className="w-4 h-4 mr-3" /> : <Eye className="w-4 h-4 mr-3" />}
                     {showProfileDetails ? 'Masquer les détails' : 'Voir les détails'}
                   </Button>
 
                   {showProfileDetails && (
-                    <div className="bg-gradient-to-br from-white/5 via-purple-900/10 to-white/5 backdrop-blur-xl rounded-xl p-5 space-y-4 border border-purple-400/20 shadow-inner animate-fade-in">
-                      <div className="grid grid-cols-1 gap-3">
-                        <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/10">
-                          <User className="w-4 h-4 text-purple-400" />
-                          <div>
-                            <p className="text-xs text-white/50">Email</p>
-                            <p className="text-sm text-white font-medium">{profile.email}</p>
-                          </div>
+                    <div className="bg-white/5 rounded-lg p-4 space-y-3 border border-white/10">
+                      <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg">
+                        <User className="w-4 h-4 text-blue-400" />
+                        <div>
+                          <p className="text-xs text-white/60">Email</p>
+                          <p className="text-sm text-white">{profile.email}</p>
                         </div>
-                        
-                        <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/10">
-                          <Calendar className="w-4 h-4 text-blue-400" />
-                          <div>
-                            <p className="text-xs text-white/50">Membre depuis</p>
-                            <p className="text-sm text-white font-medium">{formatDate(profile.created_at)}</p>
-                          </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg">
+                        <Calendar className="w-4 h-4 text-purple-400" />
+                        <div>
+                          <p className="text-xs text-white/60">Membre depuis</p>
+                          <p className="text-sm text-white">{formatDate(profile.created_at)}</p>
                         </div>
-                        
-                        <div className="flex items-center gap-3 p-3 bg-red-500/10 rounded-lg border border-red-400/20">
-                          <TrendingDown className="w-4 h-4 text-red-400" />
-                          <div>
-                            <p className="text-xs text-red-200/70">Total retiré</p>
-                            <p className="text-sm text-red-300 font-bold">{new Intl.NumberFormat('fr-FR').format(profile.total_withdrawn || 0)} FCFA</p>
-                          </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 bg-red-500/10 rounded-lg border border-red-400/20">
+                        <TrendingDown className="w-4 h-4 text-red-400" />
+                        <div>
+                          <p className="text-xs text-red-200/70">Total retiré</p>
+                          <p className="text-sm text-red-300 font-medium">
+                            {new Intl.NumberFormat('fr-FR').format(profile.total_withdrawn || 0)} FCFA
+                          </p>
                         </div>
-                        
-                        <div className="flex items-center gap-3 p-3 bg-yellow-500/10 rounded-lg border border-yellow-400/20">
-                          <Star className="w-4 h-4 text-yellow-400" />
-                          <div>
-                            <p className="text-xs text-yellow-200/70">Jeu favori</p>
-                            <p className="text-sm text-yellow-300 font-medium">{profile.favorite_game || 'Mine'}</p>
-                          </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 bg-yellow-500/10 rounded-lg border border-yellow-400/20">
+                        <Star className="w-4 h-4 text-yellow-400" />
+                        <div>
+                          <p className="text-xs text-yellow-200/70">Jeu favori</p>
+                          <p className="text-sm text-yellow-300">{profile.favorite_game || 'Mine'}</p>
                         </div>
                       </div>
                     </div>
@@ -286,18 +277,18 @@ const WithdrawalPage = () => {
                   <Button
                     onClick={handleProfileEdit}
                     variant="outline"
-                    className="w-full justify-start bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-400/30 text-blue-200 hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-purple-500/20 hover:border-blue-400/50 transition-all duration-300 backdrop-blur-sm group"
+                    className="w-full justify-start bg-blue-500/10 border-blue-400/30 text-blue-200 hover:bg-blue-500/20"
                   >
-                    <Edit className="w-4 h-4 mr-3 group-hover:scale-110 transition-transform" />
+                    <Edit className="w-4 h-4 mr-3" />
                     {isEditingProfile ? 'Sauvegarder' : 'Modifier le profil'}
                   </Button>
 
                   <Button
                     onClick={handleLogout}
                     variant="outline"
-                    className="w-full justify-start bg-gradient-to-r from-red-500/10 to-pink-500/10 border-red-400/30 text-red-200 hover:bg-gradient-to-r hover:from-red-500/20 hover:to-pink-500/20 hover:border-red-400/50 transition-all duration-300 backdrop-blur-sm group"
+                    className="w-full justify-start bg-red-500/10 border-red-400/30 text-red-200 hover:bg-red-500/20"
                   >
-                    <LogOut className="w-4 h-4 mr-3 group-hover:scale-110 transition-transform" />
+                    <LogOut className="w-4 h-4 mr-3" />
                     Se déconnecter
                   </Button>
                 </div>
