@@ -8,6 +8,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import MinePage from "./pages/MinePage";
+import RobPage from "./pages/RobPage";
+import BazPage from "./pages/BazPage";
 import AuthPage from "./pages/AuthPage";
 import DicePage from "./pages/DicePage";
 import WithdrawalPage from "./pages/WithdrawalPage";
@@ -35,6 +37,16 @@ const App = () => (
             <Route path="/mine" element={
               <ProtectedRoute>
                 <MinePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/rob" element={
+              <ProtectedRoute>
+                <RobPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/baz" element={
+              <ProtectedRoute>
+                <BazPage />
               </ProtectedRoute>
             } />
             <Route path="/dice" element={
