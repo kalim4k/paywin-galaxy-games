@@ -11,10 +11,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ProfileImageUpload } from '@/components/ProfileImageUpload';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { supabase } from '@/integrations/supabase/client';
+import { WithdrawalHistory } from '@/components/WithdrawalHistory';
+import { BetHistory } from '@/components/BetHistory';
+import { useWithdrawals } from '@/hooks/useWithdrawals';
+import { useGameBalance } from '@/hooks/useGameBalance';
 
 const WithdrawalPage = () => {
   const { profile, signOut, updateProfile } = useAuth();
+  const { updateBalance } = useGameBalance();
+  const { createWithdrawal } = useWithdrawals();
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
   const [rechargeCode, setRechargeCode] = useState('');
@@ -71,6 +76,15 @@ const WithdrawalPage = () => {
     }
   };
 
+  const formatAmount = (amount: number) => {
+    if (amount >= 1000000) {
+      return `${(amount / 1000000).toFixed(1)}M FCFA`;
+    } else if (amount >= 1000) {
+      return `${(amount / 1000).toFixed(1)}k FCFA`;
+    }
+    return `${amount} FCFA`;
+  };
+
   const handleWithdrawal = async () => {
     const amount = parseFloat(withdrawalAmount);
     if (amount < 4000) {
@@ -99,19 +113,34 @@ const WithdrawalPage = () => {
     }
 
     try {
-      // Mettre à jour le montant total retiré
-      const newTotalWithdrawn = (profile?.total_withdrawn || 0) + amount;
-      await updateProfile({ total_withdrawn: newTotalWithdrawn });
+      // Créer l'entrée de retrait
+      const success = await createWithdrawal(amount, selectedPaymentMethod, paymentAddress);
+      
+      if (success) {
+        // Mettre à jour le solde et le montant total retiré
+        const newBalance = (profile?.balance || 0) - amount;
+        const newTotalWithdrawn = (profile?.total_withdrawn || 0) + amount;
+        
+        await updateBalance(newBalance, 'game_loss', amount, `Retrait via ${selectedPaymentMethod}`);
+        await updateProfile({ total_withdrawn: newTotalWithdrawn });
 
-      toast({
-        title: "Demande de retrait envoyée",
-        description: `Retrait de ${amount} FCFA en cours de traitement`,
-      });
-      setWithdrawalAmount('');
-      setPaymentAddress('');
-      setShowAddressForm(false);
+        toast({
+          title: "Demande de retrait envoyée",
+          description: `Retrait de ${formatAmount(amount)} en cours de traitement`,
+        });
+        
+        setWithdrawalAmount('');
+        setPaymentAddress('');
+        setShowAddressForm(false);
+        setSelectedPaymentMethod(null);
+      }
     } catch (error) {
       console.error('Erreur lors du retrait:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors du retrait",
+        variant: "destructive"
+      });
     }
   };
 
@@ -216,7 +245,7 @@ const WithdrawalPage = () => {
                   <div className="bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 rounded-lg p-4 w-full border border-emerald-400/30">
                     <p className="text-xs text-emerald-200 text-center mb-1">Solde disponible</p>
                     <p className="text-2xl font-bold text-emerald-300 text-center">
-                      {new Intl.NumberFormat('fr-FR').format(profile.balance)} FCFA
+                      {formatAmount(profile.balance)}
                     </p>
                   </div>
                 </div>
@@ -259,7 +288,7 @@ const WithdrawalPage = () => {
                         <div>
                           <p className="text-xs text-red-200/70">Total retiré</p>
                           <p className="text-sm text-red-300 font-medium">
-                            {new Intl.NumberFormat('fr-FR').format(profile.total_withdrawn || 0)} FCFA
+                            {formatAmount(profile.total_withdrawn || 0)}
                           </p>
                         </div>
                       </div>
@@ -363,7 +392,7 @@ const WithdrawalPage = () => {
                     max={profile.balance}
                   />
                   <p className="text-xs text-white/60">
-                    Montant minimum: 4000 FCFA | Solde disponible: {new Intl.NumberFormat('fr-FR').format(profile.balance)} FCFA
+                    Montant minimum: 4000 FCFA | Solde disponible: {formatAmount(profile.balance)}
                   </p>
                 </div>
 
@@ -422,6 +451,12 @@ const WithdrawalPage = () => {
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Withdrawal History */}
+            <WithdrawalHistory />
+
+            {/* Bet History */}
+            <BetHistory title="Historique des 7 derniers paris" />
           </div>
         </div>
       </div>
