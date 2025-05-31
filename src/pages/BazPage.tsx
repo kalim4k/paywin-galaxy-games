@@ -3,6 +3,7 @@ import React from 'react';
 import { Header } from '../components/Header';
 import { Navigation } from '../components/Navigation';
 import { BazGame } from '../components/BazGame';
+import { BetHistory } from '../components/BetHistory';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,6 +27,7 @@ const BazPage = () => {
 
       <main className="pb-20">
         <BazGame />
+        <BetHistory gameFilter="baz" title="Mes derniers paris - Baz" />
       </main>
       
       <Navigation />

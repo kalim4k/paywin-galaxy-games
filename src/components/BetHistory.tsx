@@ -1,8 +1,6 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, TrendingDown, Clock, Gamepad2 } from 'lucide-react';
 import { useBetHistory } from '@/hooks/useBetHistory';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
@@ -23,34 +21,14 @@ export const BetHistory: React.FC<BetHistoryProps> = ({ gameFilter, title = "His
     return `${amount} FCFA`;
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getGameDisplayName = (gameName: string) => {
-    const games: { [key: string]: string } = {
-      'mine': 'Mine',
-      'dice': 'Dice',
-      'rob': 'Rob',
-      'baz': 'Baz'
-    };
-    return games[gameName] || gameName;
-  };
-
   if (loading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-blue-400">
-          <Gamepad2 className="w-5 h-5" />
+    <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl mx-4 mb-4">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-white text-lg font-medium">
           {title}
         </CardTitle>
       </CardHeader>
@@ -60,55 +38,32 @@ export const BetHistory: React.FC<BetHistoryProps> = ({ gameFilter, title = "His
             Aucun pari effectué
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-white/10">
-                  {!gameFilter && <TableHead className="text-white/70">Jeu</TableHead>}
-                  <TableHead className="text-white/70">Mise</TableHead>
-                  <TableHead className="text-white/70">Gain/Perte</TableHead>
-                  <TableHead className="text-white/70">Multiplicateur</TableHead>
-                  <TableHead className="text-white/70">Date</TableHead>
-                  <TableHead className="text-white/70">Résultat</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {betHistory.map((bet) => (
-                  <TableRow key={bet.id} className="border-white/10 hover:bg-white/5">
-                    {!gameFilter && (
-                      <TableCell className="text-white/80 font-medium">
-                        {getGameDisplayName(bet.game_name)}
-                      </TableCell>
-                    )}
-                    <TableCell className="text-orange-400 font-semibold">
-                      {formatAmount(bet.bet_amount)}
-                    </TableCell>
-                    <TableCell className={`font-semibold ${bet.result === 'win' ? 'text-green-400' : 'text-red-400'}`}>
-                      {bet.result === 'win' ? '+' : '-'}{formatAmount(bet.result === 'win' ? bet.win_amount : bet.bet_amount)}
-                    </TableCell>
-                    <TableCell className="text-purple-400 font-medium">
-                      x{bet.multiplier}
-                    </TableCell>
-                    <TableCell className="text-white/80 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {formatDate(bet.created_at)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className={`flex items-center gap-1 ${bet.result === 'win' ? 'text-green-400' : 'text-red-400'}`}>
-                        {bet.result === 'win' ? (
-                          <TrendingUp className="w-3 h-3" />
-                        ) : (
-                          <TrendingDown className="w-3 h-3" />
-                        )}
-                        <span className="text-sm font-medium capitalize">{bet.result === 'win' ? 'Gagné' : 'Perdu'}</span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className="space-y-3">
+            {/* En-têtes */}
+            <div className="grid grid-cols-4 gap-4 pb-2 border-b border-white/10">
+              <div className="text-white/60 text-sm font-medium">Joueur</div>
+              <div className="text-white/60 text-sm font-medium text-center">Mise</div>
+              <div className="text-white/60 text-sm font-medium text-center">Coef</div>
+              <div className="text-white/60 text-sm font-medium text-center">Gain</div>
+            </div>
+            
+            {/* Données */}
+            {betHistory.map((bet) => (
+              <div key={bet.id} className="grid grid-cols-4 gap-4 py-2 hover:bg-white/5 rounded-lg transition-colors">
+                <div className="text-blue-400 text-sm font-medium">Moi</div>
+                <div className="text-white text-sm text-center">
+                  {formatAmount(bet.bet_amount)}
+                </div>
+                <div className="text-white text-sm text-center">
+                  x{bet.multiplier}
+                </div>
+                <div className={`text-sm text-center font-medium ${
+                  bet.result === 'win' ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {bet.result === 'win' ? formatAmount(bet.win_amount) : '0 FCFA'}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </CardContent>

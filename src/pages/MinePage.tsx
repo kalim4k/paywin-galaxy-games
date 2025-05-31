@@ -3,6 +3,7 @@ import React from 'react';
 import { Header } from '../components/Header';
 import { Navigation } from '../components/Navigation';
 import { MineGame } from '../components/MineGame';
+import { BetHistory } from '../components/BetHistory';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,6 +27,7 @@ const MinePage = () => {
 
       <main className="pb-20">
         <MineGame />
+        <BetHistory gameFilter="mine" title="Mes derniers paris - Mine" />
       </main>
       
       <Navigation />

@@ -3,6 +3,7 @@ import React from 'react';
 import { Header } from '../components/Header';
 import { Navigation } from '../components/Navigation';
 import { DiceGame } from '../components/DiceGame';
+import { BetHistory } from '../components/BetHistory';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,6 +27,7 @@ const DicePage = () => {
 
       <main className="pb-20">
         <DiceGame />
+        <BetHistory gameFilter="dice" title="Mes derniers paris - Dice" />
       </main>
       
       <Navigation />
