@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Trophy, Medal, Award, Coins } from 'lucide-react';
+import { Trophy, Medal, Award } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
@@ -57,18 +57,13 @@ export const Leaderboard = () => {
     }
   };
 
-  const getGameDisplayName = (gameName: string) => {
-    const gameNames: { [key: string]: string } = {
-      'mine': 'Mine',
-      'dice': 'Dice',
-      'crash': 'Crash',
-      'roulette': 'Roulette'
-    };
-    return gameNames[gameName] || gameName;
-  };
-
   const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('fr-FR').format(amount);
+    if (amount >= 1000000) {
+      return `${(amount / 1000000).toFixed(1)}M FCFA`;
+    } else if (amount >= 1000) {
+      return `${(amount / 1000).toFixed(1)}k FCFA`;
+    }
+    return `${amount} FCFA`;
   };
 
   if (loading) {
@@ -92,7 +87,6 @@ export const Leaderboard = () => {
                   <tr className="border-b border-white/10">
                     <th className="text-left py-2 px-2 text-xs font-semibold text-white/70">Rang</th>
                     <th className="text-left py-2 px-2 text-xs font-semibold text-white/70">Joueur</th>
-                    <th className="text-left py-2 px-2 text-xs font-semibold text-white/70">Jeu</th>
                     <th className="text-right py-2 px-2 text-xs font-semibold text-white/70">Solde</th>
                     <th className="text-right py-2 px-2 text-xs font-semibold text-white/70">Retiré</th>
                   </tr>
@@ -129,18 +123,10 @@ export const Leaderboard = () => {
                           </div>
                         </td>
 
-                        {/* Jeu Favori */}
-                        <td className="py-2 px-2">
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                            {getGameDisplayName(player.favorite_game || 'mine')}
-                          </span>
-                        </td>
-
                         {/* Solde */}
                         <td className="py-2 px-2 text-right">
-                          <div className="flex items-center justify-end gap-1 text-xs font-bold text-green-400">
-                            <Coins className="w-3 h-3" />
-                            <span className="truncate">{formatAmount(player.balance)}</span>
+                          <div className="text-xs font-bold text-green-400 truncate">
+                            {formatAmount(player.balance)}
                           </div>
                         </td>
 
