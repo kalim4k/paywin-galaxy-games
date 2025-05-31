@@ -3,7 +3,6 @@ import React from 'react';
 import { Header } from '../components/Header';
 import { Navigation } from '../components/Navigation';
 import { RobGame } from '../components/RobGame';
-import { BetHistory } from '../components/BetHistory';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,7 +26,6 @@ const RobPage = () => {
 
       <main className="pb-20">
         <RobGame />
-        <BetHistory gameFilter="rob" title="Mes derniers paris - Rob" />
       </main>
       
       <Navigation />

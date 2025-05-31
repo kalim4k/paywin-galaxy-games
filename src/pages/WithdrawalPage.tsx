@@ -11,8 +11,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ProfileImageUpload } from '@/components/ProfileImageUpload';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { WithdrawalHistory } from '@/components/WithdrawalHistory';
-import { BetHistory } from '@/components/BetHistory';
 import { useWithdrawals } from '@/hooks/useWithdrawals';
 import { useGameBalance } from '@/hooks/useGameBalance';
 
@@ -451,12 +449,6 @@ const WithdrawalPage = () => {
                 </Button>
               </CardContent>
             </Card>
-
-            {/* Withdrawal History */}
-            <WithdrawalHistory />
-
-            {/* Bet History */}
-            <BetHistory title="Historique des 7 derniers paris" />
           </div>
         </div>
       </div>
