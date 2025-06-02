@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { History, Calendar, CreditCard, MapPin, CheckCircle } from 'lucide-react';
+import { History, Calendar, CreditCard, MapPin, CheckCircle, User, AtSign } from 'lucide-react';
 import { useWithdrawals } from '@/hooks/useWithdrawals';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
@@ -63,6 +63,8 @@ export const WithdrawalHistory = () => {
             <Table>
               <TableHeader>
                 <TableRow className="border-white/10">
+                  <TableHead className="text-white/70">Utilisateur</TableHead>
+                  <TableHead className="text-white/70">Email</TableHead>
                   <TableHead className="text-white/70">Montant</TableHead>
                   <TableHead className="text-white/70">Date</TableHead>
                   <TableHead className="text-white/70">Moyen</TableHead>
@@ -73,6 +75,18 @@ export const WithdrawalHistory = () => {
               <TableBody>
                 {withdrawals.map((withdrawal) => (
                   <TableRow key={withdrawal.id} className="border-white/10 hover:bg-white/5">
+                    <TableCell className="text-white/80">
+                      <div className="flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        <span className="text-sm">{withdrawal.full_name || 'N/A'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-white/80">
+                      <div className="flex items-center gap-1">
+                        <AtSign className="w-3 h-3" />
+                        <span className="text-sm">{withdrawal.email || 'N/A'}</span>
+                      </div>
+                    </TableCell>
                     <TableCell className="text-emerald-400 font-semibold">
                       {formatAmount(withdrawal.amount)}
                     </TableCell>

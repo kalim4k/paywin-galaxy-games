@@ -10,6 +10,8 @@ interface Withdrawal {
   payment_address: string;
   status: string;
   created_at: string;
+  full_name?: string;
+  email?: string;
 }
 
 export const useWithdrawals = () => {
@@ -22,7 +24,7 @@ export const useWithdrawals = () => {
 
     try {
       const { data, error } = await supabase
-        .from('withdrawals')
+        .from('withdrawals_with_profile')
         .select('*')
         .eq('user_id', profile.id)
         .order('created_at', { ascending: false });

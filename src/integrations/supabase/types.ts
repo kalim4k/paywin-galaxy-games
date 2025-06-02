@@ -208,7 +208,29 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      withdrawals_with_profile: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          payment_address: string | null
+          payment_method: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
