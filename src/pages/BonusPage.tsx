@@ -28,34 +28,34 @@ const BonusPage = () => {
 
         {hasVipAccess ? (
           <div className="space-y-6">
-            {/* VIP Access Card - Improved design */}
-            <Card className="bg-gradient-to-br from-amber-400/30 via-yellow-500/20 to-orange-500/30 backdrop-blur-lg border-2 border-amber-400/50 shadow-2xl relative overflow-hidden">
+            {/* VIP Access Card - Improved design with better contrast */}
+            <Card className="bg-gradient-to-br from-yellow-600/40 via-orange-600/30 to-red-600/40 backdrop-blur-lg border-2 border-yellow-400/60 shadow-2xl relative overflow-hidden">
               {/* Animated background effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 to-orange-500/10 animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 animate-pulse"></div>
               
               <CardHeader className="text-center pb-6 relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg ring-4 ring-amber-400/30">
+                <div className="w-20 h-20 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg ring-4 ring-yellow-400/40">
                   <Star className="w-10 h-10 text-white drop-shadow-lg" />
                 </div>
                 <CardTitle className="text-2xl font-bold text-white drop-shadow-lg">
                   🎉 Accès VIP Débloqué! 🎉
                 </CardTitle>
-                <div className="mt-2 px-4 py-2 bg-amber-400/20 rounded-full border border-amber-400/40">
-                  <span className="text-amber-200 font-semibold text-sm">
+                <div className="mt-2 px-4 py-2 bg-black/30 rounded-full border border-yellow-400/50">
+                  <span className="text-yellow-100 font-semibold text-sm">
                     STATUT PREMIUM ACTIVÉ
                   </span>
                 </div>
               </CardHeader>
               
               <CardContent className="text-center relative z-10">
-                <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4 mb-6 border border-amber-400/30">
+                <div className="bg-black/40 backdrop-blur-sm rounded-lg p-4 mb-6 border border-yellow-400/40">
                   <p className="text-white font-medium text-lg mb-2">
                     🏆 Félicitations! Votre solde de{' '}
-                    <span className="text-amber-300 font-bold text-xl">
+                    <span className="text-yellow-200 font-bold text-xl">
                       {profile?.balance?.toLocaleString()} FCFA
                     </span>
                   </p>
-                  <p className="text-amber-200">
+                  <p className="text-gray-200">
                     vous donne accès aux jeux VIP exclusifs.
                   </p>
                 </div>
@@ -106,14 +106,14 @@ const BonusPage = () => {
                 <p className="text-blue-200">Bonus spéciaux pour les membres VIP</p>
               </div>
               
-              <div className="bg-gradient-to-br from-amber-600/20 to-yellow-600/20 backdrop-blur-sm rounded-xl p-6 border border-amber-400/30 hover:border-amber-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20">
+              <div className="bg-gradient-to-br from-orange-600/20 to-red-600/20 backdrop-blur-sm rounded-xl p-6 border border-orange-400/30 hover:border-orange-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20">
                 <div className="flex items-center justify-center mb-4">
-                  <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center">
-                    <Star className="w-6 h-6 text-amber-300" />
+                  <div className="w-12 h-12 bg-orange-500/20 rounded-full flex items-center justify-center">
+                    <Star className="w-6 h-6 text-orange-300" />
                   </div>
                 </div>
                 <h3 className="font-bold text-white mb-3 text-lg">Récompenses exclusives</h3>
-                <p className="text-amber-200">Accès aux jeux et bonus premium</p>
+                <p className="text-orange-200">Accès aux jeux et bonus premium</p>
               </div>
             </div>
           </div>
