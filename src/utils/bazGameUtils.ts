@@ -2,8 +2,9 @@
 export const calculateMultiplier = (starsFound: number, bombCount: number) => {
   if (starsFound === 0) return 1;
   
-  const bombMultiplier = 1 + (bombCount * 0.05);
-  const starMultiplier = 1 + (starsFound * 0.15);
+  // Multiplicateurs plus généreux pour Baz
+  const bombMultiplier = 1 + (bombCount * 0.08); // Augmenté de 0.05 à 0.08
+  const starMultiplier = 1 + (starsFound * 0.25); // Augmenté de 0.15 à 0.25
   const finalMultiplier = bombMultiplier * starMultiplier;
   
   return Math.max(1, Number(finalMultiplier.toFixed(3)));
@@ -27,15 +28,15 @@ export const initializeGameBoard = (bombs: number): ('hidden' | 'star' | 'bomb')
   return newBoard;
 };
 
-// Probabilités beaucoup plus favorables pour Baz
+// Probabilités encore plus favorables pour Baz
 export const calculateBazBombProbability = (starsFound: number): number => {
-  if (starsFound === 0) return 0.05; // Seulement 5% de chance à la première étoile
-  if (starsFound <= 2) return 0.08; // 8% de chance pour les 2-3 premières étoiles
-  if (starsFound <= 5) return 0.12; // 12% de chance pour les étoiles 4-6
-  if (starsFound <= 8) return 0.18; // 18% de chance pour les étoiles 7-9
-  if (starsFound <= 12) return 0.25; // 25% de chance pour les étoiles 10-13
-  if (starsFound <= 16) return 0.35; // 35% de chance pour les étoiles 14-17
-  return 0.50; // 50% de chance maximum même en fin de partie
+  if (starsFound === 0) return 0.02; // Réduit de 5% à 2% pour la première étoile
+  if (starsFound <= 2) return 0.05; // Réduit de 8% à 5% pour les 2-3 premières étoiles
+  if (starsFound <= 5) return 0.08; // Réduit de 12% à 8% pour les étoiles 4-6
+  if (starsFound <= 8) return 0.12; // Réduit de 18% à 12% pour les étoiles 7-9
+  if (starsFound <= 12) return 0.18; // Réduit de 25% à 18% pour les étoiles 10-13
+  if (starsFound <= 16) return 0.25; // Réduit de 35% à 25% pour les étoiles 14-17
+  return 0.35; // Réduit de 50% à 35% maximum même en fin de partie
 };
 
 export const shouldPlaceBazBomb = (
@@ -53,7 +54,7 @@ export const shouldPlaceBazBomb = (
   // Si on doit placer toutes les bombes restantes dans les dernières cellules
   if (remainingCells <= (maxBombs - bombsPlaced)) return true;
   
-  // Utiliser les probabilités favorables de Baz
+  // Utiliser les probabilités encore plus favorables de Baz
   const bombProbability = calculateBazBombProbability(starsFound);
   return Math.random() < bombProbability;
 };
