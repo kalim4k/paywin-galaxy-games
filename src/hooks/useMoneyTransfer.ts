@@ -44,13 +44,20 @@ export const useMoneyTransfer = () => {
   const transferMoney = async (receiverEmail: string, amount: number, description: string = 'Transfert d\'argent') => {
     setLoading(true);
     try {
+      console.log('Début du transfert:', { receiverEmail, amount, description });
+      
       const { data, error } = await supabase.rpc('transfer_money', {
         p_receiver_email: receiverEmail,
         p_amount: amount,
         p_description: description
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erreur RPC:', error);
+        throw error;
+      }
+
+      console.log('Résultat du transfert:', data);
 
       const result = data as { success: boolean; error?: string; message?: string };
       
