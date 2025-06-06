@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gift, Clock, Star, Gem, Zap } from 'lucide-react';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
+import { MoneyTransfer } from '@/components/MoneyTransfer';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -93,6 +95,9 @@ const BonusPage = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Money Transfer Component - VIP Feature */}
+            <MoneyTransfer />
 
             {/* Additional VIP Benefits - Improved design */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

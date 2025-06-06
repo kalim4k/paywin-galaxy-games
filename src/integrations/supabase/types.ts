@@ -91,6 +91,51 @@ export type Database = {
           },
         ]
       }
+      money_transfers: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          receiver_id: string
+          sender_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          receiver_id: string
+          sender_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          receiver_id?: string
+          sender_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "money_transfers_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "money_transfers_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -233,7 +278,14 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      transfer_money: {
+        Args: {
+          p_receiver_email: string
+          p_amount: number
+          p_description?: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
