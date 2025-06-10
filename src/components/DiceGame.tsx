@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DiceWheel } from './DiceWheel';
 import { DiceBetOptions } from './DiceBetOptions';
@@ -67,18 +66,19 @@ export const DiceGame = () => {
 
     // Simuler le spin (2 secondes)
     setTimeout(async () => {
-      // Générer un résultat aléatoire avec probabilités réalistes
+      // PROBABILITÉS MODIFIÉES - Plus difficile de gagner
       const random = Math.random();
       let resultColor: 'red' | 'black' | 'blue';
       let resultNumber: number;
       
-      if (random < 0.45) {
+      // Nouvelles probabilités favorisant les pertes
+      if (random < 0.35) { // 35% pour rouge (était 45%)
         resultColor = 'red';
         resultNumber = Math.floor(Math.random() * 8) + 1; // 1-8 pour rouge
-      } else if (random < 0.9) {
+      } else if (random < 0.85) { // 50% pour noir (était 45%)
         resultColor = 'black';
         resultNumber = 0; // 0 pour noir
-      } else {
+      } else { // 15% pour bleu (était 10%)
         resultColor = 'blue';
         resultNumber = 11; // 11 pour bleu
       }

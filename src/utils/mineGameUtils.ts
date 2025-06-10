@@ -31,12 +31,12 @@ export const initializeGameBoard = (bombs: number): ('hidden' | 'star' | 'bomb')
   return newBoard;
 };
 
-// Nouveau: Calculer la probabilité de tomber sur une bombe selon les étoiles trouvées
+// PROBABILITÉS AUGMENTÉES - Plus difficile de gagner
 export const calculateBombProbability = (starsFound: number): number => {
-  if (starsFound === 0) return 0.20; // 20% de chance à la première étoile
-  if (starsFound === 1) return 0.50; // 50% de chance à la deuxième étoile
-  if (starsFound === 2) return 0.85; // 85% de chance à la troisième étoile
-  return 0.95; // 95% de chance pour les étoiles suivantes (quasi impossible)
+  if (starsFound === 0) return 0.35; // 35% de chance à la première étoile (était 20%)
+  if (starsFound === 1) return 0.65; // 65% de chance à la deuxième étoile (était 50%)
+  if (starsFound === 2) return 0.90; // 90% de chance à la troisième étoile (était 85%)
+  return 0.98; // 98% de chance pour les étoiles suivantes (était 95%)
 };
 
 // Nouveau: Décider dynamiquement si une cellule devient une bombe
@@ -55,7 +55,7 @@ export const shouldPlaceBomb = (
   // Si on doit placer toutes les bombes restantes dans les dernières cellules
   if (remainingCells <= (maxBombs - bombsPlaced)) return true;
   
-  // Utiliser la probabilité basée sur les étoiles trouvées
+  // Utiliser la probabilité augmentée basée sur les étoiles trouvées
   const bombProbability = calculateBombProbability(starsFound);
   return Math.random() < bombProbability;
 };
