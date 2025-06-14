@@ -2,8 +2,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { ShoppingCart, Zap, Star, Crown, Diamond } from 'lucide-react';
+import { ShoppingCart, Coins } from 'lucide-react';
 
 interface RechargeCodePurchaseProps {
   isOpen: boolean;
@@ -14,38 +13,22 @@ export const RechargeCodePurchase = ({ isOpen, onClose }: RechargeCodePurchasePr
   const rechargeOptions = [
     {
       amount: 2000,
-      icon: Zap,
-      color: 'from-blue-500 to-blue-600',
-      borderColor: 'border-blue-400/30',
-      textColor: 'text-blue-300',
-      popular: false,
+      coins: 2000,
       paymentLink: '#' // Tu remplaceras par le vrai lien
     },
     {
       amount: 3000,
-      icon: Star,
-      color: 'from-purple-500 to-purple-600',
-      borderColor: 'border-purple-400/30',
-      textColor: 'text-purple-300',
-      popular: false,
+      coins: 3000,
       paymentLink: '#'
     },
     {
       amount: 5000,
-      icon: Crown,
-      color: 'from-amber-500 to-orange-600',
-      borderColor: 'border-amber-400/30',
-      textColor: 'text-amber-300',
-      popular: true,
+      coins: 5000,
       paymentLink: '#'
     },
     {
       amount: 10000,
-      icon: Diamond,
-      color: 'from-emerald-500 to-emerald-600',
-      borderColor: 'border-emerald-400/30',
-      textColor: 'text-emerald-300',
-      popular: false,
+      coins: 10000,
       paymentLink: '#'
     }
   ];
@@ -60,63 +43,47 @@ export const RechargeCodePurchase = ({ isOpen, onClose }: RechargeCodePurchasePr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gradient-to-br from-slate-900 via-purple-900/50 to-slate-900 border border-white/20 max-w-2xl">
+      <DialogContent className="bg-slate-900 border border-purple-500/30 max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white text-center mb-6">
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <ShoppingCart className="w-5 h-5 text-white" />
-              </div>
+          <DialogTitle className="text-xl font-bold text-white text-center mb-4">
+            <div className="flex items-center justify-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-purple-400" />
               Acheter un code de recharge
             </div>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          {rechargeOptions.map((option) => {
-            const IconComponent = option.icon;
-            return (
-              <Card 
-                key={option.amount}
-                className={`relative bg-black/40 backdrop-blur-md border ${option.borderColor} hover:shadow-xl transition-all duration-300 hover:scale-105 group overflow-hidden`}
-              >
-                {option.popular && (
-                  <div className="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-violet-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-                    POPULAIRE
+        <div className="space-y-3">
+          {rechargeOptions.map((option) => (
+            <div 
+              key={option.amount}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl p-4 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center">
+                  <Coins className="w-6 h-6 text-purple-800" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-white">
+                    {formatAmount(option.coins)}
                   </div>
-                )}
-                
-                <CardContent className="p-6 text-center space-y-4">
-                  <div className={`w-16 h-16 mx-auto bg-gradient-to-r ${option.color} rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className="w-8 h-8 text-white" />
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">
-                      {formatAmount(option.amount)} FCFA
-                    </h3>
-                    <p className={`text-sm ${option.textColor} font-medium`}>
-                      Code de recharge
-                    </p>
-                  </div>
-                  
-                  <Button
-                    onClick={() => handlePurchase(option.paymentLink)}
-                    className={`w-full bg-gradient-to-r ${option.color} hover:opacity-90 text-white font-medium py-3 h-auto shadow-lg group-hover:shadow-xl transition-all duration-300`}
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Acheter
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        <div className="mt-8 p-4 bg-white/5 rounded-lg border border-white/10">
-          <p className="text-white/70 text-sm text-center">
-            💡 Les codes de recharge sont livrés instantanément après paiement
-          </p>
+                  <div className="text-purple-200 text-sm">Coins</div>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <div className="text-yellow-300 font-bold text-lg mb-2">
+                  {formatAmount(option.amount)} FCFA
+                </div>
+                <Button
+                  onClick={() => handlePurchase(option.paymentLink)}
+                  className="bg-white text-purple-700 hover:bg-gray-100 font-medium px-4 py-1 h-8 text-sm"
+                >
+                  + Acheter
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
       </DialogContent>
     </Dialog>
