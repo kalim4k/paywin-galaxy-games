@@ -14,12 +14,14 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { WithdrawalHistory } from '@/components/WithdrawalHistory';
 import { useWithdrawals } from '@/hooks/useWithdrawals';
 import { useGameBalance } from '@/hooks/useGameBalance';
+import { useRechargeCodes } from '@/hooks/useRechargeCodes';
 import { RechargeCodePurchase } from '@/components/RechargeCodePurchase';
 
 const WithdrawalPage = () => {
   const { profile, signOut, updateProfile } = useAuth();
   const { updateBalance } = useGameBalance();
   const { createWithdrawal } = useWithdrawals();
+  const { validateRechargeCode, isLoading: isValidatingCode } = useRechargeCodes();
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
   const [rechargeCode, setRechargeCode] = useState('');
@@ -149,13 +151,18 @@ const WithdrawalPage = () => {
     window.open('https://odqwetyq.mychariow.com/prd_xoqblm/checkout', '_blank');
   };
 
-  const handleRechargeCode = () => {
+  const handleRechargeCode = async () => {
     if (rechargeCode.trim()) {
+      const success = await validateRechargeCode(rechargeCode);
+      if (success) {
+        setRechargeCode('');
+      }
+    } else {
       toast({
-        title: "Code de recharge",
-        description: "Code de recharge en cours de vérification",
+        title: "Code requis",
+        description: "Veuillez entrer un code de recharge",
+        variant: "destructive"
       });
-      setRechargeCode('');
     }
   };
 
@@ -367,17 +374,19 @@ const WithdrawalPage = () => {
                 <div className="space-y-3">
                   <Input
                     type="text"
-                    placeholder="Code de recharge"
+                    placeholder="Entrez votre code de recharge"
                     value={rechargeCode}
-                    onChange={(e) => setRechargeCode(e.target.value)}
+                    onChange={(e) => setRechargeCode(e.target.value.toUpperCase())}
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400"
+                    disabled={isValidatingCode}
                   />
                   <Button 
                     onClick={handleRechargeCode}
+                    disabled={isValidatingCode || !rechargeCode.trim()}
                     variant="outline"
-                    className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
+                    className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white disabled:opacity-50"
                   >
-                    Valider le code
+                    {isValidatingCode ? 'Validation...' : 'Valider le code'}
                   </Button>
                 </div>
               </CardContent>
