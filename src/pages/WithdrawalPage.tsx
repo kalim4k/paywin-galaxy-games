@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { User, Wallet, CreditCard, Plus, Minus, LogOut, Edit, Eye, EyeOff, Phone, AtSign, TrendingDown, Calendar, Star } from 'lucide-react';
+import { User, Wallet, CreditCard, Plus, Minus, LogOut, Edit, Eye, EyeOff, Phone, AtSign, TrendingDown, Calendar, Star, ShoppingCart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileImageUpload } from '@/components/ProfileImageUpload';
@@ -14,6 +14,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { WithdrawalHistory } from '@/components/WithdrawalHistory';
 import { useWithdrawals } from '@/hooks/useWithdrawals';
 import { useGameBalance } from '@/hooks/useGameBalance';
+import { RechargeCodePurchase } from '@/components/RechargeCodePurchase';
 
 const WithdrawalPage = () => {
   const { profile, signOut, updateProfile } = useAuth();
@@ -27,6 +28,7 @@ const WithdrawalPage = () => {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [showProfileDetails, setShowProfileDetails] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showRechargeCodePurchase, setShowRechargeCodePurchase] = useState(false);
   const [editForm, setEditForm] = useState({
     full_name: profile?.full_name || '',
     email: profile?.email || ''
@@ -86,10 +88,10 @@ const WithdrawalPage = () => {
 
   const handleWithdrawal = async () => {
     const amount = parseFloat(withdrawalAmount);
-    if (amount < 4000) {
+    if (amount < 7000) {
       toast({
         title: "Montant invalide",
-        description: "Le montant minimum de retrait est de 4000 FCFA",
+        description: "Le montant minimum de retrait est de 7000 FCFA",
         variant: "destructive"
       });
       return;
@@ -335,13 +337,23 @@ const WithdrawalPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <Button 
-                  onClick={handleDeposit}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 h-auto shadow-sm"
-                >
-                  <CreditCard className="w-5 h-5 mr-2" />
-                  Effectuer un dépôt
-                </Button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Button 
+                    onClick={handleDeposit}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 h-auto shadow-sm"
+                  >
+                    <CreditCard className="w-5 h-5 mr-2" />
+                    Effectuer un dépôt
+                  </Button>
+                  
+                  <Button 
+                    onClick={() => setShowRechargeCodePurchase(true)}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 h-auto shadow-sm"
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Acheter un code
+                  </Button>
+                </div>
                 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
@@ -383,15 +395,15 @@ const WithdrawalPage = () => {
                 <div className="space-y-3">
                   <Input
                     type="number"
-                    placeholder="Montant à retirer (min: 4000 FCFA)"
+                    placeholder="Montant à retirer (min: 7000 FCFA)"
                     value={withdrawalAmount}
                     onChange={(e) => setWithdrawalAmount(e.target.value)}
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400"
-                    min="4000"
+                    min="7000"
                     max={profile.balance}
                   />
                   <p className="text-xs text-white/60">
-                    Montant minimum: 4000 FCFA | Solde disponible: {formatAmount(profile.balance)}
+                    Montant minimum: 7000 FCFA | Solde disponible: {formatAmount(profile.balance)}
                   </p>
                 </div>
 
@@ -459,6 +471,10 @@ const WithdrawalPage = () => {
 
       <Navigation />
       <PWAInstallPrompt />
+      <RechargeCodePurchase 
+        isOpen={showRechargeCodePurchase}
+        onClose={() => setShowRechargeCodePurchase(false)}
+      />
     </div>
   );
 };
