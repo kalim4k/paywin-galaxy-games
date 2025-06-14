@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,7 +19,7 @@ export const Header = () => {
         <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
           <span className="text-black font-bold text-lg">P</span>
         </div>
-        
+        <span className="text-white font-bold text-xl">PAYWIN</span>
       </div>
       
       <div className="flex items-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 px-4 py-2 rounded-full">
