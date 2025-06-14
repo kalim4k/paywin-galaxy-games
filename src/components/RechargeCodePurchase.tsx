@@ -13,23 +13,23 @@ export const RechargeCodePurchase = ({ isOpen, onClose }: RechargeCodePurchasePr
   const rechargeOptions = [
     {
       amount: 2000,
-      coins: 2000,
-      paymentLink: '#' // Tu remplaceras par le vrai lien
+      rechargeAmount: 2000,
+      paymentLink: 'https://odqwetyq.mychariow.com/prd_p96ebk/checkout'
     },
     {
       amount: 3000,
-      coins: 3000,
-      paymentLink: '#'
+      rechargeAmount: 3000,
+      paymentLink: 'https://odqwetyq.mychariow.com/prd_8tsczl/checkout'
     },
     {
       amount: 5000,
-      coins: 5000,
-      paymentLink: '#'
+      rechargeAmount: 5000,
+      paymentLink: 'https://odqwetyq.mychariow.com/prd_w04kg8/checkout'
     },
     {
       amount: 10000,
-      coins: 10000,
-      paymentLink: '#'
+      rechargeAmount: 10000,
+      paymentLink: 'https://odqwetyq.mychariow.com/prd_56cn8e/checkout'
     }
   ];
 
@@ -65,9 +65,9 @@ export const RechargeCodePurchase = ({ isOpen, onClose }: RechargeCodePurchasePr
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-white">
-                    {formatAmount(option.coins)}
+                    {formatAmount(option.rechargeAmount)}
                   </div>
-                  <div className="text-purple-200 text-sm">Coins</div>
+                  <div className="text-purple-200 text-sm">FCFA rechargés</div>
                 </div>
               </div>
               
