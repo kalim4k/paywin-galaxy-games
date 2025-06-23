@@ -10,6 +10,7 @@ interface GameBoardProps {
   onCellClick: (index: number) => void;
   showingBombs?: boolean;
   bombPositions?: number[];
+  isDesktop?: boolean;
 }
 
 export const GameBoard = ({ 
@@ -19,11 +20,24 @@ export const GameBoard = ({
   gameEnded, 
   onCellClick,
   showingBombs = false,
-  bombPositions = []
+  bombPositions = [],
+  isDesktop = false
 }: GameBoardProps) => {
+  const boardClasses = isDesktop 
+    ? "bg-gray-800/50 rounded-2xl p-4 w-fit mx-auto"
+    : "bg-gray-800/50 rounded-2xl p-3 mb-3";
+    
+  const gridClasses = isDesktop 
+    ? "grid grid-cols-5 gap-3"
+    : "grid grid-cols-5 gap-2";
+    
+  const cellClasses = isDesktop
+    ? "w-12 h-12 rounded-lg border-2 transition-all duration-75 text-base font-bold"
+    : "aspect-square rounded-xl border-2 transition-all duration-75 text-lg font-bold";
+
   return (
-    <div className="bg-gray-800/50 rounded-2xl p-3 mb-3">
-      <div className="grid grid-cols-5 gap-2">
+    <div className={boardClasses}>
+      <div className={gridClasses}>
         {gameBoard.map((cell, index) => {
           const isRevealed = revealedCells[index];
           const isBombPosition = bombPositions.includes(index);
@@ -35,7 +49,7 @@ export const GameBoard = ({
               onClick={() => onCellClick(index)}
               disabled={!isPlaying || isRevealed || gameEnded}
               className={`
-                aspect-square rounded-xl border-2 transition-all duration-75 text-lg font-bold
+                ${cellClasses}
                 ${isRevealed 
                   ? cell === 'bomb' 
                     ? 'bg-red-500 border-red-400 shadow-lg shadow-red-500/30' 
@@ -52,9 +66,9 @@ export const GameBoard = ({
               {(isRevealed || shouldShowBomb) && (
                 <>
                   {(cell === 'bomb' || shouldShowBomb) ? (
-                    <Bomb className="w-6 h-6 text-white" />
+                    <Bomb className={isDesktop ? "w-5 h-5 text-white" : "w-6 h-6 text-white"} />
                   ) : (
-                    <Star className="w-6 h-6 text-white fill-current" />
+                    <Star className={isDesktop ? "w-5 h-5 text-white fill-current" : "w-6 h-6 text-white fill-current"} />
                   )}
                 </>
               )}
