@@ -4,8 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { PlusCircle, Image, Video, Link, Sparkles } from 'lucide-react';
+import { PlusCircle, Image, Video, Link, Sparkles, Upload, X } from 'lucide-react';
 import { usePosts } from '@/hooks/usePosts';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 export const CreatePost = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,8 +20,14 @@ export const CreatePost = () => {
     button_link: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
 
   const { createPost } = usePosts();
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,13 +61,104 @@ export const CreatePost = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const uploadFile = async (file: File, bucket: string) => {
+    if (!user) return null;
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+    
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(fileName, file);
+      
+    if (error) throw error;
+    
+    const { data: { publicUrl } } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(fileName);
+      
+    return publicUrl;
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un fichier image valide",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setUploadingImage(true);
+    try {
+      const url = await uploadFile(file, 'post-images');
+      if (url) {
+        setFormData(prev => ({ ...prev, image_url: url }));
+        setImageFile(file);
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de l'upload de l'image",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('video/')) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un fichier vidéo valide",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setUploadingVideo(true);
+    try {
+      const url = await uploadFile(file, 'post-videos');
+      if (url) {
+        setFormData(prev => ({ ...prev, video_url: url }));
+        setVideoFile(file);
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de l'upload de la vidéo",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingVideo(false);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, image_url: '' }));
+    setImageFile(null);
+  };
+
+  const removeVideo = () => {
+    setFormData(prev => ({ ...prev, video_url: '' }));
+    setVideoFile(null);
+  };
+
   if (!isOpen) {
     return (
-      <Card className="bg-gradient-to-br from-purple-600/20 via-pink-600/20 to-orange-600/20 backdrop-blur-lg border-2 border-purple-400/30 shadow-2xl mb-8 hover:shadow-purple-500/20 transition-all duration-300">
+      <Card className="bg-black/40 backdrop-blur-lg border border-white/20 shadow-2xl mb-8 hover:shadow-white/10 transition-all duration-300">
         <CardContent className="p-6">
           <Button
             onClick={() => setIsOpen(true)}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 rounded-xl transition-all duration-300 hover:scale-105"
+            className="w-full bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600/90 hover:to-pink-600/90 text-white font-semibold py-4 rounded-xl transition-all duration-300 hover:scale-105 border border-white/20"
           >
             <PlusCircle className="w-5 h-5 mr-2" />
             <Sparkles className="w-4 h-4 mr-2" />
@@ -70,7 +170,7 @@ export const CreatePost = () => {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-purple-600/20 via-pink-600/20 to-orange-600/20 backdrop-blur-lg border-2 border-purple-400/30 shadow-2xl mb-8">
+    <Card className="bg-black/40 backdrop-blur-lg border border-white/20 shadow-2xl mb-8">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-white flex items-center">
           <Sparkles className="w-6 h-6 mr-2 text-yellow-400" />
@@ -94,36 +194,62 @@ export const CreatePost = () => {
             />
           </div>
 
-          {/* URL d'image */}
+          {/* Upload d'image */}
           <div className="space-y-2">
-            <Label htmlFor="image_url" className="text-white font-medium flex items-center">
+            <Label className="text-white font-medium flex items-center">
               <Image className="w-4 h-4 mr-2" />
-              Image (URL)
+              Image
             </Label>
-            <Input
-              id="image_url"
-              type="url"
-              placeholder="https://exemple.com/image.jpg"
-              value={formData.image_url}
-              onChange={(e) => handleInputChange('image_url', e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="bg-white/10 border-white/20 text-white file:bg-white/20 file:text-white file:border-0 file:rounded-md file:px-3 file:py-1"
+                disabled={uploadingImage}
+              />
+              {uploadingImage && <div className="text-white/70 text-sm">Upload...</div>}
+              {imageFile && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={removeImage}
+                  className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
 
-          {/* URL de vidéo */}
+          {/* Upload de vidéo */}
           <div className="space-y-2">
-            <Label htmlFor="video_url" className="text-white font-medium flex items-center">
+            <Label className="text-white font-medium flex items-center">
               <Video className="w-4 h-4 mr-2" />
-              Vidéo (URL)
+              Vidéo
             </Label>
-            <Input
-              id="video_url"
-              type="url"
-              placeholder="https://exemple.com/video.mp4"
-              value={formData.video_url}
-              onChange={(e) => handleInputChange('video_url', e.target.value)}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                type="file"
+                accept="video/*"
+                onChange={handleVideoUpload}
+                className="bg-white/10 border-white/20 text-white file:bg-white/20 file:text-white file:border-0 file:rounded-md file:px-3 file:py-1"
+                disabled={uploadingVideo}
+              />
+              {uploadingVideo && <div className="text-white/70 text-sm">Upload...</div>}
+              {videoFile && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={removeVideo}
+                  className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Bouton personnalisé */}
@@ -179,7 +305,7 @@ export const CreatePost = () => {
               type="button"
               variant="outline"
               onClick={() => setIsOpen(false)}
-              className="flex-1 border-white/20 text-white hover:bg-white/10"
+              className="flex-1 border-white/30 text-white hover:bg-white/10"
               disabled={isSubmitting}
             >
               Annuler
@@ -187,10 +313,10 @@ export const CreatePost = () => {
             <Button
               type="submit"
               disabled={
-                isSubmitting || 
+                isSubmitting || uploadingImage || uploadingVideo ||
                 (!formData.content.trim() && !formData.image_url && !formData.video_url)
               }
-              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              className="flex-1 bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600/90 hover:to-pink-600/90 text-white border border-white/20"
             >
               {isSubmitting ? 'Publication...' : 'Publier'}
             </Button>
