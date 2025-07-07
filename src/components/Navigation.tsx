@@ -43,13 +43,24 @@ export const Navigation = () => {
             <button
               key={item.id}
               onClick={() => handleNavigation(item)}
-              className={`flex flex-col items-center py-2 px-4 rounded-lg transition-all duration-200 ${
+              className={`relative flex flex-col items-center py-2 px-4 rounded-lg transition-all duration-200 ${
                 isActive 
                   ? 'text-yellow-400 bg-yellow-400/10' 
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <Icon className={`w-6 h-6 mb-1 ${isActive ? 'scale-110' : ''}`} />
+              {/* Point bleu animé pour Flux et Bonus */}
+              {(item.id === 'flux' || item.id === 'bonus') && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse shadow-lg shadow-blue-500/50">
+                  <div className="absolute inset-0 w-3 h-3 bg-blue-400 rounded-full animate-ping"></div>
+                </div>
+              )}
+              
+              <Icon className={`w-6 h-6 mb-1 transition-all duration-300 ${
+                isActive ? 'scale-110' : ''
+              } ${
+                (item.id === 'flux' || item.id === 'bonus') ? 'animate-bounce' : ''
+              }`} />
               <span className="text-xs font-medium">{item.label}</span>
             </button>
           );
