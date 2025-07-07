@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Gamepad2, Trophy, Gift, CreditCard } from 'lucide-react';
+import { Gamepad2, Trophy, Gift, CreditCard, Rss } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Navigation = () => {
@@ -13,6 +13,7 @@ export const Navigation = () => {
     if (path.includes('withdrawal')) return 'retrait';
     if (path.includes('bonus')) return 'bonus';
     if (path.includes('leaderboard')) return 'classement';
+    if (path.includes('flux')) return 'flux';
     return 'jeux';
   };
 
@@ -20,6 +21,7 @@ export const Navigation = () => {
 
   const navItems = [
     { id: 'jeux', label: 'Jeux', icon: Gamepad2, path: '/' },
+    { id: 'flux', label: 'Flux', icon: Rss, path: '/flux' },
     { id: 'classement', label: 'Classement', icon: Trophy, path: '/leaderboard' },
     { id: 'bonus', label: 'Bonus', icon: Gift, path: '/bonus' },
     { id: 'retrait', label: 'Retrait', icon: CreditCard, path: '/withdrawal' },

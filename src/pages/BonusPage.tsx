@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gift, Clock, Star, Gem, Zap } from 'lucide-react';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { MoneyTransfer } from '@/components/MoneyTransfer';
+import { CreatePost } from '@/components/CreatePost';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -95,6 +96,9 @@ const BonusPage = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Create Post Component - VIP Feature */}
+            <CreatePost />
 
             {/* Money Transfer Component - VIP Feature */}
             <MoneyTransfer />
