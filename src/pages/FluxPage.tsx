@@ -18,8 +18,6 @@ const FluxPage = () => {
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
 
-  const hasVipAccess = profile && profile.balance >= 150000;
-
   const handleCommentSubmit = async (postId: string) => {
     const content = commentInputs[postId]?.trim();
     if (!content) return;
@@ -40,27 +38,6 @@ const FluxPage = () => {
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
     return `${Math.floor(diffInSeconds / 86400)}j`;
   };
-
-  if (!hasVipAccess) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <Header />
-        <div className="max-w-4xl mx-auto px-4 py-8 pb-20 flex items-center justify-center min-h-[60vh]">
-          <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl p-8 text-center">
-            <h1 className="text-2xl font-bold text-white mb-4">Accès VIP Requis</h1>
-            <p className="text-white/70 mb-6">
-              Vous devez avoir un solde d'au moins 150,000 FCFA pour accéder au flux.
-            </p>
-            <p className="text-white/50">
-              Votre solde actuel: {profile?.balance?.toLocaleString()} FCFA
-            </p>
-          </Card>
-        </div>
-        <Navigation />
-        <PWAInstallPrompt />
-      </div>
-    );
-  }
 
   if (loading) {
     return (
