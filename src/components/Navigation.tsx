@@ -21,7 +21,6 @@ export const Navigation = () => {
 
   const navItems = [
     { id: 'jeux', label: 'Jeux', icon: Gamepad2, path: '/' },
-    { id: 'flux', label: 'Flux', icon: Rss, path: '/flux' },
     { id: 'classement', label: 'Classement', icon: Trophy, path: '/leaderboard' },
     { id: 'bonus', label: 'Bonus', icon: Gift, path: '/bonus' },
     { id: 'retrait', label: 'Retrait', icon: CreditCard, path: '/withdrawal' },
@@ -50,7 +49,7 @@ export const Navigation = () => {
               }`}
             >
               {/* Point bleu animé pour Flux et Bonus */}
-              {(item.id === 'flux' || item.id === 'bonus') && (
+              {item.id === 'bonus' && (
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse shadow-lg shadow-blue-500/50">
                   <div className="absolute inset-0 w-3 h-3 bg-blue-400 rounded-full animate-ping"></div>
                 </div>
@@ -59,7 +58,7 @@ export const Navigation = () => {
               <Icon className={`w-6 h-6 mb-1 transition-all duration-300 ${
                 isActive ? 'scale-110' : ''
               } ${
-                (item.id === 'flux' || item.id === 'bonus') ? 'animate-bounce' : ''
+                item.id === 'bonus' ? 'animate-bounce' : ''
               }`} />
               <span className="text-xs font-medium">{item.label}</span>
             </button>
