@@ -28,7 +28,7 @@ serve(async (req) => {
       totalPrice: amount,
       article: [
         {
-          recharge: amount,
+          "Recharge Paywin": amount,
         },
       ],
       personal_Info: [
@@ -37,7 +37,7 @@ serve(async (req) => {
           amount: amount,
         },
       ],
-      numeroSend: "",
+      numeroSend: "00000000",
       nomclient: userName || userEmail || "Client Paywin",
       return_url: `${origin}/withdrawal?payment=success`,
       webhook_url: `https://dtlgcbqufokwfwdphlig.supabase.co/functions/v1/payment-webhook`,
@@ -66,6 +66,7 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } else {
+      console.error('FusionPay error:', result.message);
       return new Response(
         JSON.stringify({ error: result.message || 'Payment initiation failed' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
