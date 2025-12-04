@@ -1,8 +1,10 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Coins } from 'lucide-react';
+import { ShoppingCart, Coins, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/sonner';
 
 interface RechargeCodePurchaseProps {
   isOpen: boolean;
@@ -10,31 +12,51 @@ interface RechargeCodePurchaseProps {
 }
 
 export const RechargeCodePurchase = ({ isOpen, onClose }: RechargeCodePurchaseProps) => {
+  const { profile } = useAuth();
+  const [loadingAmount, setLoadingAmount] = useState<number | null>(null);
+
   const rechargeOptions = [
-    {
-      amount: 2000,
-      rechargeAmount: 2000,
-      paymentLink: 'https://odqwetyq.mychariow.com/prd_p96ebk/checkout'
-    },
-    {
-      amount: 3000,
-      rechargeAmount: 3000,
-      paymentLink: 'https://odqwetyq.mychariow.com/prd_8tsczl/checkout'
-    },
-    {
-      amount: 5000,
-      rechargeAmount: 5000,
-      paymentLink: 'https://odqwetyq.mychariow.com/prd_w04kg8/checkout'
-    },
-    {
-      amount: 10000,
-      rechargeAmount: 10000,
-      paymentLink: 'https://odqwetyq.mychariow.com/prd_56cn8e/checkout'
-    }
+    { amount: 2000 },
+    { amount: 3000 },
+    { amount: 5000 },
+    { amount: 10000 }
   ];
 
-  const handlePurchase = (paymentLink: string) => {
-    window.open(paymentLink, '_blank');
+  const handlePurchase = async (amount: number) => {
+    if (!profile) {
+      toast.error('Vous devez être connecté pour effectuer une recharge');
+      return;
+    }
+
+    setLoadingAmount(amount);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('initiate-payment', {
+        body: {
+          amount,
+          userId: profile.id,
+          userEmail: profile.email,
+          userName: profile.full_name
+        }
+      });
+
+      if (error) {
+        console.error('Payment error:', error);
+        toast.error('Erreur lors de l\'initiation du paiement');
+        return;
+      }
+
+      if (data?.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      } else {
+        toast.error('Impossible d\'obtenir le lien de paiement');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error('Une erreur est survenue');
+    } finally {
+      setLoadingAmount(null);
+    }
   };
 
   const formatAmount = (amount: number) => {
@@ -48,7 +70,7 @@ export const RechargeCodePurchase = ({ isOpen, onClose }: RechargeCodePurchasePr
           <DialogTitle className="text-xl font-bold text-white text-center mb-4">
             <div className="flex items-center justify-center gap-2">
               <ShoppingCart className="w-5 h-5 text-purple-400" />
-              Acheter un code de recharge
+              Recharger mon compte
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -65,26 +87,30 @@ export const RechargeCodePurchase = ({ isOpen, onClose }: RechargeCodePurchasePr
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-white">
-                    {formatAmount(option.rechargeAmount)}
+                    {formatAmount(option.amount)}
                   </div>
-                  <div className="text-purple-200 text-sm">FCFA rechargés</div>
+                  <div className="text-purple-200 text-sm">FCFA</div>
                 </div>
               </div>
               
-              <div className="text-right">
-                <div className="text-yellow-300 font-bold text-lg mb-2">
-                  {formatAmount(option.amount)} FCFA
-                </div>
-                <Button
-                  onClick={() => handlePurchase(option.paymentLink)}
-                  className="bg-white text-purple-700 hover:bg-gray-100 font-medium px-4 py-1 h-8 text-sm"
-                >
-                  + Acheter
-                </Button>
-              </div>
+              <Button
+                onClick={() => handlePurchase(option.amount)}
+                disabled={loadingAmount !== null}
+                className="bg-white text-purple-700 hover:bg-gray-100 font-medium px-4 py-1 h-10 text-sm min-w-[100px]"
+              >
+                {loadingAmount === option.amount ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  `Payer ${formatAmount(option.amount)} F`
+                )}
+              </Button>
             </div>
           ))}
         </div>
+
+        <p className="text-xs text-white/60 text-center mt-4">
+          Paiement sécurisé via MoneyFusion
+        </p>
       </DialogContent>
     </Dialog>
   );

@@ -14,17 +14,14 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { WithdrawalHistory } from '@/components/WithdrawalHistory';
 import { useWithdrawals } from '@/hooks/useWithdrawals';
 import { useGameBalance } from '@/hooks/useGameBalance';
-import { useRechargeCodes } from '@/hooks/useRechargeCodes';
+
 import { RechargeCodePurchase } from '@/components/RechargeCodePurchase';
 
 const WithdrawalPage = () => {
   const { profile, signOut, updateProfile } = useAuth();
   const { updateBalance } = useGameBalance();
   const { createWithdrawal } = useWithdrawals();
-  const { validateRechargeCode, isLoading: isValidatingCode } = useRechargeCodes();
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
-  const [depositAmount, setDepositAmount] = useState('');
-  const [rechargeCode, setRechargeCode] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [paymentAddress, setPaymentAddress] = useState('');
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -150,20 +147,6 @@ const WithdrawalPage = () => {
     window.open('https://odqwetyq.mychariow.com/prd_xoqblm/checkout', '_blank');
   };
 
-  const handleRechargeCode = async () => {
-    if (rechargeCode.trim()) {
-      const success = await validateRechargeCode(rechargeCode);
-      if (success) {
-        setRechargeCode('');
-      }
-    } else {
-      toast({
-        title: "Code requis",
-        description: "Veuillez entrer un code de recharge",
-        variant: "destructive"
-      });
-    }
-  };
 
   const selectPaymentMethod = (methodId: string) => {
     setSelectedPaymentMethod(methodId);
@@ -357,35 +340,7 @@ const WithdrawalPage = () => {
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 h-auto shadow-sm"
                   >
                     <ShoppingCart className="w-5 h-5 mr-2" />
-                    Acheter un code de recharge
-                  </Button>
-                </div>
-                
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/20"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="bg-transparent px-3 text-white/70">ou</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <Input
-                    type="text"
-                    placeholder="Entrez votre code de recharge"
-                    value={rechargeCode}
-                    onChange={(e) => setRechargeCode(e.target.value.toUpperCase())}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400"
-                    disabled={isValidatingCode}
-                  />
-                  <Button 
-                    onClick={handleRechargeCode}
-                    disabled={isValidatingCode || !rechargeCode.trim()}
-                    variant="outline"
-                    className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white disabled:opacity-50"
-                  >
-                    {isValidatingCode ? 'Validation...' : 'Valider le code'}
+                    Recharger mon compte
                   </Button>
                 </div>
               </CardContent>
