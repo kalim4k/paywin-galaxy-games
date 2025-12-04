@@ -42,9 +42,8 @@ const WithdrawalPage = () => {
     { id: 'mtn', name: 'MTN Money', image: 'https://bienetrechien.com/wp-content/uploads/2025/08/mtn-1.jpg', type: 'mobile' },
     { id: 'orange', name: 'Orange Money', image: 'https://bienetrechien.com/wp-content/uploads/2025/08/Orange-Money-recrute-pour-ce-poste-22-Mars-2023.png', type: 'mobile' },
     { id: 'wave', name: 'Wave', image: 'https://bienetrechien.com/wp-content/uploads/2025/08/wave.png', type: 'mobile' },
-    { id: 'mix', name: 'Mix by Yass', image: 'https://celinaroom.com/wp-content/uploads/2025/05/mixx-by-yas.jpg', type: 'mobile' },
+    { id: 'mix', name: 'Mix by Yass', image: 'https://bienetrechien.com/wp-content/uploads/2025/08/mix-by-yass.jpg', type: 'mobile' },
     { id: 'paypal', name: 'PayPal', image: 'https://bienetrechien.com/wp-content/uploads/2025/08/paypal1.png', type: 'email' },
-    { id: 'ton', name: 'TON', image: 'https://celinaroom.com/wp-content/uploads/2025/01/toncoin-ton-logo.png', type: 'wallet' },
   ];
 
   const getPlaceholderText = (methodId: string) => {
