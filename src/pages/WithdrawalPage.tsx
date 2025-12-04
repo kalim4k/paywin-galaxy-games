@@ -3,9 +3,7 @@ import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { User, Wallet, CreditCard, Plus, Minus, LogOut, Edit, Eye, EyeOff, Phone, AtSign, TrendingDown, Calendar, Star, ShoppingCart } from 'lucide-react';
+import { User, Wallet, Plus, Minus, LogOut, Edit, ChevronRight, Phone, AtSign, TrendingDown, Calendar, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileImageUpload } from '@/components/ProfileImageUpload';
@@ -14,7 +12,6 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { WithdrawalHistory } from '@/components/WithdrawalHistory';
 import { useWithdrawals } from '@/hooks/useWithdrawals';
 import { useGameBalance } from '@/hooks/useGameBalance';
-
 import { RechargeCodePurchase } from '@/components/RechargeCodePurchase';
 
 const WithdrawalPage = () => {
@@ -46,107 +43,65 @@ const WithdrawalPage = () => {
   const getPlaceholderText = (methodId: string) => {
     const method = paymentMethods.find(m => m.id === methodId);
     if (!method) return 'Entrez votre adresse';
-    
     switch (method.type) {
-      case 'mobile':
-        return 'Entrez votre numéro de téléphone';
-      case 'email':
-        return 'Entrez votre adresse email';
-      case 'wallet':
-        return 'Entrez votre adresse wallet';
-      default:
-        return 'Entrez votre adresse';
+      case 'mobile': return 'Numéro de téléphone';
+      case 'email': return 'Adresse email';
+      default: return 'Adresse';
     }
   };
 
   const getInputIcon = (methodId: string) => {
     const method = paymentMethods.find(m => m.id === methodId);
     if (!method) return null;
-    
     switch (method.type) {
-      case 'mobile':
-        return <Phone className="w-4 h-4 text-gray-400" />;
-      case 'email':
-        return <AtSign className="w-4 h-4 text-gray-400" />;
-      case 'wallet':
-        return <Wallet className="w-4 h-4 text-gray-400" />;
-      default:
-        return null;
+      case 'mobile': return <Phone className="w-5 h-5 text-gray-400" />;
+      case 'email': return <AtSign className="w-5 h-5 text-gray-400" />;
+      default: return <Wallet className="w-5 h-5 text-gray-400" />;
     }
   };
 
   const formatAmount = (amount: number) => {
-    if (amount >= 1000000) {
-      return `${(amount / 1000000).toFixed(1)}M FCFA`;
-    } else if (amount >= 1000) {
-      return `${(amount / 1000).toFixed(1)}k FCFA`;
-    }
-    return `${amount} FCFA`;
+    return new Intl.NumberFormat('fr-FR').format(amount);
+  };
+
+  const formatAmountShort = (amount: number) => {
+    if (amount >= 1000000) return `${(amount / 1000000).toFixed(1)}M`;
+    if (amount >= 1000) return `${(amount / 1000).toFixed(0)}k`;
+    return `${amount}`;
   };
 
   const handleWithdrawal = async () => {
     const amount = parseFloat(withdrawalAmount);
     if (amount < 7000) {
-      toast({
-        title: "Montant invalide",
-        description: "Le montant minimum de retrait est de 7000 FCFA",
-        variant: "destructive"
-      });
+      toast({ title: "Montant invalide", description: "Minimum 7 000 FCFA", variant: "destructive" });
       return;
     }
     if (amount > (profile?.balance || 0)) {
-      toast({
-        title: "Solde insuffisant",
-        description: "Votre solde est insuffisant pour ce retrait",
-        variant: "destructive"
-      });
+      toast({ title: "Solde insuffisant", variant: "destructive" });
       return;
     }
     if (!selectedPaymentMethod || !paymentAddress) {
-      toast({
-        title: "Informations manquantes",
-        description: "Veuillez sélectionner un moyen de paiement et entrer vos informations",
-        variant: "destructive"
-      });
+      toast({ title: "Informations manquantes", variant: "destructive" });
       return;
     }
 
     try {
-      // Créer l'entrée de retrait
       const success = await createWithdrawal(amount, selectedPaymentMethod, paymentAddress);
-      
       if (success) {
-        // Mettre à jour le solde et le montant total retiré
         const newBalance = (profile?.balance || 0) - amount;
         const newTotalWithdrawn = (profile?.total_withdrawn || 0) + amount;
-        
         await updateBalance(newBalance, 'game_loss', amount, `Retrait via ${selectedPaymentMethod}`);
         await updateProfile({ total_withdrawn: newTotalWithdrawn });
-
-        toast({
-          title: "Demande de retrait envoyée",
-          description: `Retrait de ${formatAmount(amount)} en cours de traitement`,
-        });
-        
+        toast({ title: "Demande envoyée", description: `${formatAmount(amount)} FCFA en traitement` });
         setWithdrawalAmount('');
         setPaymentAddress('');
         setShowAddressForm(false);
         setSelectedPaymentMethod(null);
       }
     } catch (error) {
-      console.error('Erreur lors du retrait:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors du retrait",
-        variant: "destructive"
-      });
+      toast({ title: "Erreur", variant: "destructive" });
     }
   };
-
-  const handleDeposit = () => {
-    window.open('https://odqwetyq.mychariow.com/prd_xoqblm/checkout', '_blank');
-  };
-
 
   const selectPaymentMethod = (methodId: string) => {
     setSelectedPaymentMethod(methodId);
@@ -154,282 +109,226 @@ const WithdrawalPage = () => {
     setPaymentAddress('');
   };
 
-  const handleLogout = async () => {
-    await signOut();
-  };
+  const handleLogout = async () => { await signOut(); };
 
   const handleProfileEdit = async () => {
     if (isEditingProfile) {
       try {
-        await updateProfile({
-          full_name: editForm.full_name,
-        });
+        await updateProfile({ full_name: editForm.full_name });
         setIsEditingProfile(false);
-      } catch (error) {
-        console.error('Error updating profile:', error);
-      }
+      } catch (error) { console.error(error); }
     } else {
-      setEditForm({
-        full_name: profile?.full_name || '',
-        email: profile?.email || ''
-      });
+      setEditForm({ full_name: profile?.full_name || '', email: profile?.email || '' });
       setIsEditingProfile(true);
     }
   };
 
   const handleImageUpdate = async (avatarUrl: string) => {
-    try {
-      await updateProfile({ avatar_url: avatarUrl });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de l\'avatar:', error);
-    }
+    try { await updateProfile({ avatar_url: avatarUrl }); } catch (error) { console.error(error); }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    return new Date(dateString).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
-  if (!profile) {
-    return <LoadingSpinner />;
-  }
+  if (!profile) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-[#F2F2F7]">
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 py-8 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Section */}
-          <div className="lg:col-span-1">
-            <Card className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
-              <CardHeader className="pb-6">
-                <div className="flex flex-col items-center space-y-4">
-                  {/* Photo de profil */}
-                  <ProfileImageUpload 
-                    currentAvatarUrl={profile.avatar_url}
-                    onImageUpdate={handleImageUpdate}
-                  />
-                  
-                  {/* Nom et email */}
-                  <div className="text-center space-y-2 w-full">
-                    {isEditingProfile ? (
-                      <Input
-                        value={editForm.full_name}
-                        onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
-                        className="text-lg font-semibold text-center bg-white/20 border-white/30 text-white placeholder:text-white/70"
-                        placeholder="Nom complet"
-                      />
-                    ) : (
-                      <h2 className="text-xl font-semibold text-white">
-                        {profile.full_name || 'Utilisateur'}
-                      </h2>
-                    )}
-                    <p className="text-white/70 text-sm">{profile.email}</p>
-                  </div>
-
-                  {/* Balance */}
-                  <div className="bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 rounded-lg p-4 w-full border border-emerald-400/30">
-                    <p className="text-xs text-emerald-200 text-center mb-1">Solde disponible</p>
-                    <p className="text-2xl font-bold text-emerald-300 text-center">
-                      {formatAmount(profile.balance)}
-                    </p>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                <Separator className="bg-white/20" />
-
-                {/* Actions du profil */}
-                <div className="space-y-3">
-                  <Button
-                    onClick={() => setShowProfileDetails(!showProfileDetails)}
-                    variant="outline"
-                    className="w-full justify-start bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  >
-                    {showProfileDetails ? <EyeOff className="w-4 h-4 mr-3" /> : <Eye className="w-4 h-4 mr-3" />}
-                    {showProfileDetails ? 'Masquer les détails' : 'Voir les détails'}
-                  </Button>
-
-                  {showProfileDetails && (
-                    <div className="bg-white/5 rounded-lg p-4 space-y-3 border border-white/10">
-                      <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg">
-                        <User className="w-4 h-4 text-blue-400" />
-                        <div>
-                          <p className="text-xs text-white/60">Email</p>
-                          <p className="text-sm text-white">{profile.email}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3 p-3 bg-white/10 rounded-lg">
-                        <Calendar className="w-4 h-4 text-purple-400" />
-                        <div>
-                          <p className="text-xs text-white/60">Membre depuis</p>
-                          <p className="text-sm text-white">{formatDate(profile.created_at)}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3 p-3 bg-red-500/10 rounded-lg border border-red-400/20">
-                        <TrendingDown className="w-4 h-4 text-red-400" />
-                        <div>
-                          <p className="text-xs text-red-200/70">Total retiré</p>
-                          <p className="text-sm text-red-300 font-medium">
-                            {formatAmount(profile.total_withdrawn || 0)}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3 p-3 bg-yellow-500/10 rounded-lg border border-yellow-400/20">
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        <div>
-                          <p className="text-xs text-yellow-200/70">Jeu favori</p>
-                          <p className="text-sm text-yellow-300">{profile.favorite_game || 'Mine'}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <Button
-                    onClick={handleProfileEdit}
-                    variant="outline"
-                    className="w-full justify-start bg-blue-500/10 border-blue-400/30 text-blue-200 hover:bg-blue-500/20"
-                  >
-                    <Edit className="w-4 h-4 mr-3" />
-                    {isEditingProfile ? 'Sauvegarder' : 'Modifier le profil'}
-                  </Button>
-
-                  <Button
-                    onClick={handleLogout}
-                    variant="outline"
-                    className="w-full justify-start bg-red-500/10 border-red-400/30 text-red-200 hover:bg-red-500/20"
-                  >
-                    <LogOut className="w-4 h-4 mr-3" />
-                    Se déconnecter
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+      <div className="max-w-lg mx-auto px-4 py-6 pb-24 space-y-6">
+        
+        {/* Profile Card */}
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="p-6 flex items-center gap-4">
+            <ProfileImageUpload currentAvatarUrl={profile.avatar_url} onImageUpdate={handleImageUpdate} />
+            <div className="flex-1 min-w-0">
+              {isEditingProfile ? (
+                <Input
+                  value={editForm.full_name}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
+                  className="text-lg font-semibold border-gray-200"
+                  placeholder="Votre nom"
+                />
+              ) : (
+                <h2 className="text-lg font-semibold text-gray-900 truncate">
+                  {profile.full_name || 'Utilisateur'}
+                </h2>
+              )}
+              <p className="text-sm text-gray-500 truncate">{profile.email}</p>
+            </div>
+            <button onClick={handleProfileEdit} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+              <Edit className="w-5 h-5 text-gray-400" />
+            </button>
+          </div>
+          
+          {/* Balance */}
+          <div className="px-6 pb-6">
+            <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl p-5 text-white">
+              <p className="text-emerald-100 text-sm font-medium mb-1">Solde disponible</p>
+              <p className="text-3xl font-bold tracking-tight">{formatAmount(profile.balance)} <span className="text-lg font-medium opacity-80">FCFA</span></p>
+            </div>
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Deposit Section */}
-            <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-emerald-400">
-                  <Plus className="w-5 h-5" />
-                  Dépôt d'argent
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Button 
-                    onClick={handleDeposit}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 h-auto shadow-sm"
-                  >
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Effectuer un dépôt
-                  </Button>
-                  
-                  <Button 
-                    onClick={() => setShowRechargeCodePurchase(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 h-auto shadow-sm"
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    Recharger mon compte
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Profile Details Toggle */}
+          <button 
+            onClick={() => setShowProfileDetails(!showProfileDetails)}
+            className="w-full px-6 py-4 flex items-center justify-between border-t border-gray-100 hover:bg-gray-50 transition-colors"
+          >
+            <span className="text-gray-600 font-medium">Détails du profil</span>
+            <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${showProfileDetails ? 'rotate-90' : ''}`} />
+          </button>
 
-            {/* Withdrawal Section */}
-            <Card className="bg-black/20 backdrop-blur-md border border-white/10 shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-400">
-                  <Minus className="w-5 h-5" />
-                  Retrait d'argent
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  <Input
-                    type="number"
-                    placeholder="Montant à retirer (min: 7000 FCFA)"
-                    value={withdrawalAmount}
-                    onChange={(e) => setWithdrawalAmount(e.target.value)}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400"
-                    min="7000"
-                    max={profile.balance}
-                  />
-                  <p className="text-xs text-white/60">
-                    Montant minimum: 7000 FCFA | Solde disponible: {formatAmount(profile.balance)}
-                  </p>
-                </div>
-
-                {/* Payment Methods Grid */}
+          {showProfileDetails && (
+            <div className="px-6 pb-4 space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                <User className="w-5 h-5 text-blue-500" />
                 <div>
-                  <h3 className="text-sm font-medium text-white/70 mb-4">Choisir le moyen de paiement</h3>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                    {paymentMethods.map((method) => (
-                      <button
-                        key={method.id}
-                        onClick={() => selectPaymentMethod(method.id)}
-                        className={`p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
-                          selectedPaymentMethod === method.id
-                            ? 'border-blue-400 bg-blue-500/20 shadow-sm'
-                            : 'border-white/20 hover:border-white/30 bg-white/5'
-                        }`}
-                      >
-                        <img
-                          src={method.image}
-                          alt={method.name}
-                          className="w-10 h-10 mx-auto mb-2 rounded object-cover"
-                        />
-                        <p className="text-xs text-center text-white font-medium">{method.name}</p>
-                      </button>
-                    ))}
-                  </div>
+                  <p className="text-xs text-gray-500">Email</p>
+                  <p className="text-sm font-medium text-gray-900">{profile.email}</p>
                 </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                <Calendar className="w-5 h-5 text-purple-500" />
+                <div>
+                  <p className="text-xs text-gray-500">Membre depuis</p>
+                  <p className="text-sm font-medium text-gray-900">{formatDate(profile.created_at)}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-red-50 rounded-xl">
+                <TrendingDown className="w-5 h-5 text-red-500" />
+                <div>
+                  <p className="text-xs text-gray-500">Total retiré</p>
+                  <p className="text-sm font-medium text-red-600">{formatAmount(profile.total_withdrawn || 0)} FCFA</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-xl">
+                <Star className="w-5 h-5 text-amber-500" />
+                <div>
+                  <p className="text-xs text-gray-500">Jeu favori</p>
+                  <p className="text-sm font-medium text-gray-900">{profile.favorite_game || 'Mine'}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
-                {/* Address Form */}
-                {showAddressForm && selectedPaymentMethod && (
-                  <div className="space-y-3 p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
-                    <div className="text-sm font-medium text-white/70">
-                      Informations pour {paymentMethods.find(m => m.id === selectedPaymentMethod)?.name}
-                    </div>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        {getInputIcon(selectedPaymentMethod)}
-                      </div>
-                      <Input
-                        type="text"
-                        placeholder={getPlaceholderText(selectedPaymentMethod)}
-                        value={paymentAddress}
-                        onChange={(e) => setPaymentAddress(e.target.value)}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-blue-400 pl-10"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <Button 
-                  onClick={handleWithdrawal}
-                  disabled={!withdrawalAmount || !selectedPaymentMethod || !paymentAddress}
-                  className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:hover:bg-gray-600 text-white font-medium py-3 h-auto shadow-sm"
-                >
-                  Demander le retrait
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Withdrawal History */}
-            <WithdrawalHistory />
+        {/* Recharge Section */}
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                <Plus className="w-5 h-5 text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Recharger</h3>
+            </div>
+            <Button 
+              onClick={() => setShowRechargeCodePurchase(true)}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-4 rounded-xl text-base shadow-sm"
+            >
+              Recharger mon compte
+            </Button>
           </div>
         </div>
+
+        {/* Withdrawal Section */}
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="p-5">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <Minus className="w-5 h-5 text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Retrait</h3>
+            </div>
+
+            {/* Amount Input */}
+            <div className="mb-5">
+              <label className="text-sm font-medium text-gray-600 mb-2 block">Montant</label>
+              <div className="relative">
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={withdrawalAmount}
+                  onChange={(e) => setWithdrawalAmount(e.target.value)}
+                  className="text-2xl font-semibold h-14 pr-16 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  min="7000"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">FCFA</span>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Min. 7 000 FCFA • Disponible: {formatAmountShort(profile.balance)} FCFA
+              </p>
+            </div>
+
+            {/* Payment Methods */}
+            <div className="mb-5">
+              <label className="text-sm font-medium text-gray-600 mb-3 block">Mode de paiement</label>
+              <div className="grid grid-cols-3 gap-2">
+                {paymentMethods.map((method) => (
+                  <button
+                    key={method.id}
+                    onClick={() => selectPaymentMethod(method.id)}
+                    className={`p-3 rounded-xl border-2 transition-all ${
+                      selectedPaymentMethod === method.id
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-100 hover:border-gray-200 bg-gray-50'
+                    }`}
+                  >
+                    <img
+                      src={method.image}
+                      alt={method.name}
+                      className="w-10 h-10 mx-auto mb-1.5 rounded-lg object-cover"
+                    />
+                    <p className="text-[10px] text-center text-gray-600 font-medium leading-tight">{method.name}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Address Input */}
+            {showAddressForm && selectedPaymentMethod && (
+              <div className="mb-5">
+                <label className="text-sm font-medium text-gray-600 mb-2 block">
+                  {paymentMethods.find(m => m.id === selectedPaymentMethod)?.name}
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    {getInputIcon(selectedPaymentMethod)}
+                  </div>
+                  <Input
+                    type="text"
+                    placeholder={getPlaceholderText(selectedPaymentMethod)}
+                    value={paymentAddress}
+                    onChange={(e) => setPaymentAddress(e.target.value)}
+                    className="pl-12 h-12 border-gray-200 rounded-xl"
+                  />
+                </div>
+              </div>
+            )}
+
+            <Button 
+              onClick={handleWithdrawal}
+              disabled={!withdrawalAmount || !selectedPaymentMethod || !paymentAddress}
+              className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold py-4 rounded-xl text-base shadow-sm transition-colors"
+            >
+              Demander le retrait
+            </Button>
+          </div>
+        </div>
+
+        {/* Withdrawal History */}
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <WithdrawalHistory />
+        </div>
+
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className="w-full py-4 text-red-500 font-semibold text-center hover:bg-red-50 rounded-2xl transition-colors"
+        >
+          Se déconnecter
+        </button>
       </div>
 
       <Navigation />
