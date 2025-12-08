@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Mail, Lock, User, Eye, EyeOff, Ticket } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 const PROMO_CODE = "WIN2026";
 
@@ -212,13 +213,13 @@ export const AuthPage = () => {
         <div className="mt-8 text-center">
           <p className="text-white/70 text-sm">
             En continuant, vous acceptez nos{' '}
-            <span className="text-yellow-300 underline cursor-pointer">
+            <Link to="/terms" className="text-yellow-300 underline cursor-pointer hover:text-yellow-200">
               conditions d'utilisation
-            </span>{' '}
+            </Link>{' '}
             et notre{' '}
-            <span className="text-yellow-300 underline cursor-pointer">
+            <Link to="/privacy" className="text-yellow-300 underline cursor-pointer hover:text-yellow-200">
               politique de confidentialité
-            </span>
+            </Link>
           </p>
         </div>
       </div>

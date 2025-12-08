@@ -18,6 +18,8 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import FluxPage from "./pages/FluxPage";
 import GameNotAvailablePage from "./pages/GameNotAvailablePage";
 import NotFound from "./pages/NotFound";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/" element={
               <ProtectedRoute>
                 <Index />
