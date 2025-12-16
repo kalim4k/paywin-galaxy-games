@@ -3,12 +3,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Lock, User, Eye, EyeOff, Ticket } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
-
-const PROMO_CODE = "WIN2026";
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,8 +16,7 @@ export const AuthPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    fullName: '',
-    promoCode: ''
+    fullName: ''
   });
 
   const { signIn, signUp } = useAuth();
@@ -41,15 +38,6 @@ export const AuthPage = () => {
       if (isLogin) {
         await signIn(formData.email, formData.password);
       } else {
-        if (formData.promoCode.toUpperCase() !== PROMO_CODE) {
-          toast({
-            title: "Code promo invalide",
-            description: "Veuillez entrer un code promo valide pour créer un compte.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
         if (formData.password !== formData.confirmPassword) {
           throw new Error('Les mots de passe ne correspondent pas');
         }
@@ -147,44 +135,24 @@ export const AuthPage = () => {
             </div>
 
             {!isLogin && (
-              <>
-                <div className="space-y-3">
-                  <Label htmlFor="confirmPassword" className="text-white font-semibold text-lg">
-                    Confirmer le mot de passe
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 w-6 h-6" />
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type="password"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      placeholder="Confirmez votre mot de passe"
-                      className="pl-14 h-14 bg-white/25 border-white/40 text-white placeholder:text-white/70 focus:border-yellow-300 focus:ring-yellow-300 text-lg rounded-2xl"
-                      required={!isLogin}
-                    />
-                  </div>
+              <div className="space-y-3">
+                <Label htmlFor="confirmPassword" className="text-white font-semibold text-lg">
+                  Confirmer le mot de passe
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 w-6 h-6" />
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    placeholder="Confirmez votre mot de passe"
+                    className="pl-14 h-14 bg-white/25 border-white/40 text-white placeholder:text-white/70 focus:border-yellow-300 focus:ring-yellow-300 text-lg rounded-2xl"
+                    required={!isLogin}
+                  />
                 </div>
-                <div className="space-y-3">
-                  <Label htmlFor="promoCode" className="text-white font-semibold text-lg">
-                    Code promo <span className="text-yellow-300">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Ticket className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 w-6 h-6" />
-                    <Input
-                      id="promoCode"
-                      name="promoCode"
-                      type="text"
-                      value={formData.promoCode}
-                      onChange={handleInputChange}
-                      placeholder="Entrez votre code promo"
-                      className="pl-14 h-14 bg-white/25 border-white/40 text-white placeholder:text-white/70 focus:border-yellow-300 focus:ring-yellow-300 text-lg rounded-2xl uppercase"
-                      required={!isLogin}
-                    />
-                  </div>
-                </div>
-              </>
+              </div>
             )}
 
             <Button
