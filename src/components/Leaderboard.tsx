@@ -8,7 +8,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 interface LeaderboardEntry {
   id: string;
-  full_name: string;
+  display_name: string;
   avatar_url: string | null;
   balance: number;
   total_withdrawn: number;
@@ -25,9 +25,10 @@ export const Leaderboard = () => {
 
   const fetchLeaderboard = async () => {
     try {
+      // Use secure leaderboard_view that anonymizes user names
       const { data, error } = await supabase
-        .from('profiles')
-        .select('id, full_name, avatar_url, balance, total_withdrawn, favorite_game')
+        .from('leaderboard_view')
+        .select('id, display_name, avatar_url, balance, total_withdrawn, favorite_game')
         .order('balance', { ascending: false })
         .limit(10);
 
@@ -114,11 +115,11 @@ export const Leaderboard = () => {
                             <Avatar className="w-6 h-6">
                               <AvatarImage src={player.avatar_url || undefined} />
                               <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs">
-                                {player.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                                {player.display_name?.charAt(0)?.toUpperCase() || 'J'}
                               </AvatarFallback>
                             </Avatar>
                             <div className="text-xs font-medium text-white truncate max-w-20">
-                              {player.full_name || 'Anonyme'}
+                              {player.display_name || 'Joueur'}
                             </div>
                           </div>
                         </td>
