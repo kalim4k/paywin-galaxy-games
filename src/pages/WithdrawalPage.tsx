@@ -3,7 +3,7 @@ import { Header } from '@/components/Header';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User, Wallet, Plus, Minus, LogOut, Edit, ChevronRight, Phone, AtSign, TrendingDown, Calendar, Star } from 'lucide-react';
+import { User, Wallet, ArrowUpRight, ArrowDownLeft, LogOut, Settings, Phone, AtSign, ChevronDown, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileImageUpload } from '@/components/ProfileImageUpload';
@@ -22,12 +22,11 @@ const WithdrawalPage = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [paymentAddress, setPaymentAddress] = useState('');
   const [showAddressForm, setShowAddressForm] = useState(false);
-  const [showProfileDetails, setShowProfileDetails] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showRechargeCodePurchase, setShowRechargeCodePurchase] = useState(false);
+  const [activeTab, setActiveTab] = useState<'withdraw' | 'history'>('withdraw');
   const [editForm, setEditForm] = useState({
     full_name: profile?.full_name || '',
-    email: profile?.email || ''
   });
   const { toast } = useToast();
 
@@ -54,20 +53,14 @@ const WithdrawalPage = () => {
     const method = paymentMethods.find(m => m.id === methodId);
     if (!method) return null;
     switch (method.type) {
-      case 'mobile': return <Phone className="w-5 h-5 text-gray-400" />;
-      case 'email': return <AtSign className="w-5 h-5 text-gray-400" />;
-      default: return <Wallet className="w-5 h-5 text-gray-400" />;
+      case 'mobile': return <Phone className="w-4 h-4 text-muted-foreground" />;
+      case 'email': return <AtSign className="w-4 h-4 text-muted-foreground" />;
+      default: return <Wallet className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('fr-FR').format(amount);
-  };
-
-  const formatAmountShort = (amount: number) => {
-    if (amount >= 1000000) return `${(amount / 1000000).toFixed(1)}M`;
-    if (amount >= 1000) return `${(amount / 1000).toFixed(0)}k`;
-    return `${amount}`;
   };
 
   const handleWithdrawal = async () => {
@@ -118,7 +111,7 @@ const WithdrawalPage = () => {
         setIsEditingProfile(false);
       } catch (error) { console.error(error); }
     } else {
-      setEditForm({ full_name: profile?.full_name || '', email: profile?.email || '' });
+      setEditForm({ full_name: profile?.full_name || '' });
       setIsEditingProfile(true);
     }
   };
@@ -127,160 +120,155 @@ const WithdrawalPage = () => {
     try { await updateProfile({ avatar_url: avatarUrl }); } catch (error) { console.error(error); }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
-
   if (!profile) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-[#F2F2F7]">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       <Header />
 
-      <div className="max-w-lg mx-auto px-4 py-6 pb-24 space-y-6">
+      <div className="max-w-md mx-auto px-4 py-6 pb-28 space-y-5">
         
-        {/* Profile Card */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-6 flex items-center gap-4">
+        {/* Profile Header */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl border border-slate-700/50 p-6">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl" />
+          
+          <div className="relative flex items-center gap-4">
             <ProfileImageUpload currentAvatarUrl={profile.avatar_url} onImageUpdate={handleImageUpdate} />
             <div className="flex-1 min-w-0">
               {isEditingProfile ? (
                 <Input
                   value={editForm.full_name}
                   onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
-                  className="text-lg font-semibold border-gray-200"
+                  className="text-lg font-semibold bg-slate-800/50 border-slate-600 text-white"
                   placeholder="Votre nom"
+                  onBlur={handleProfileEdit}
+                  onKeyDown={(e) => e.key === 'Enter' && handleProfileEdit()}
                 />
               ) : (
-                <h2 className="text-lg font-semibold text-gray-900 truncate">
+                <h2 
+                  onClick={() => setIsEditingProfile(true)}
+                  className="text-xl font-bold text-white truncate cursor-pointer hover:text-emerald-400 transition-colors"
+                >
                   {profile.full_name || 'Utilisateur'}
                 </h2>
               )}
-              <p className="text-sm text-gray-500 truncate">{profile.email}</p>
+              <p className="text-sm text-slate-400 truncate">{profile.email}</p>
             </div>
-            <button onClick={handleProfileEdit} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-              <Edit className="w-5 h-5 text-gray-400" />
+            <button 
+              onClick={handleLogout}
+              className="p-2.5 rounded-xl bg-slate-800/50 hover:bg-red-500/20 border border-slate-700/50 hover:border-red-500/50 transition-all group"
+            >
+              <LogOut className="w-4 h-4 text-slate-400 group-hover:text-red-400 transition-colors" />
             </button>
           </div>
+        </div>
+
+        {/* Balance Card */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-emerald-700 p-6 shadow-lg shadow-emerald-500/20">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
           
-          {/* Balance */}
-          <div className="px-6 pb-6">
-            <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl p-5 text-white">
-              <p className="text-emerald-100 text-sm font-medium mb-1">Solde disponible</p>
-              <p className="text-3xl font-bold tracking-tight">{formatAmount(profile.balance)} <span className="text-lg font-medium opacity-80">FCFA</span></p>
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-3">
+              <Wallet className="w-4 h-4 text-emerald-200" />
+              <span className="text-sm font-medium text-emerald-100">Solde disponible</span>
+            </div>
+            <p className="text-4xl font-bold text-white tracking-tight mb-4">
+              {formatAmount(profile.balance)} <span className="text-xl font-normal text-emerald-200">FCFA</span>
+            </p>
+            
+            <div className="flex gap-3">
+              <Button 
+                onClick={() => setShowRechargeCodePurchase(true)}
+                className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0 font-medium py-5 rounded-xl backdrop-blur-sm"
+              >
+                <ArrowDownLeft className="w-4 h-4 mr-2" />
+                Recharger
+              </Button>
+              <Button 
+                onClick={() => setActiveTab('withdraw')}
+                variant="outline"
+                className="flex-1 bg-transparent hover:bg-white/10 text-white border-white/30 font-medium py-5 rounded-xl"
+              >
+                <ArrowUpRight className="w-4 h-4 mr-2" />
+                Retirer
+              </Button>
             </div>
           </div>
+        </div>
 
-          {/* Profile Details Toggle */}
-          <button 
-            onClick={() => setShowProfileDetails(!showProfileDetails)}
-            className="w-full px-6 py-4 flex items-center justify-between border-t border-gray-100 hover:bg-gray-50 transition-colors"
+        {/* Tab Navigation */}
+        <div className="flex gap-2 p-1.5 bg-slate-800/50 rounded-2xl border border-slate-700/50">
+          <button
+            onClick={() => setActiveTab('withdraw')}
+            className={`flex-1 py-3 px-4 rounded-xl font-medium text-sm transition-all ${
+              activeTab === 'withdraw' 
+                ? 'bg-white text-slate-900 shadow-sm' 
+                : 'text-slate-400 hover:text-white'
+            }`}
           >
-            <span className="text-gray-600 font-medium">Détails du profil</span>
-            <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${showProfileDetails ? 'rotate-90' : ''}`} />
+            Nouveau retrait
           </button>
-
-          {showProfileDetails && (
-            <div className="px-6 pb-4 space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                <User className="w-5 h-5 text-blue-500" />
-                <div>
-                  <p className="text-xs text-gray-500">Email</p>
-                  <p className="text-sm font-medium text-gray-900">{profile.email}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                <Calendar className="w-5 h-5 text-purple-500" />
-                <div>
-                  <p className="text-xs text-gray-500">Membre depuis</p>
-                  <p className="text-sm font-medium text-gray-900">{formatDate(profile.created_at)}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-red-50 rounded-xl">
-                <TrendingDown className="w-5 h-5 text-red-500" />
-                <div>
-                  <p className="text-xs text-gray-500">Total retiré</p>
-                  <p className="text-sm font-medium text-red-600">{formatAmount(profile.total_withdrawn || 0)} FCFA</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-xl">
-                <Star className="w-5 h-5 text-amber-500" />
-                <div>
-                  <p className="text-xs text-gray-500">Jeu favori</p>
-                  <p className="text-sm font-medium text-gray-900">{profile.favorite_game || 'Mine'}</p>
-                </div>
-              </div>
-            </div>
-          )}
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`flex-1 py-3 px-4 rounded-xl font-medium text-sm transition-all ${
+              activeTab === 'history' 
+                ? 'bg-white text-slate-900 shadow-sm' 
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Historique
+          </button>
         </div>
 
-        {/* Recharge Section */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-5">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                <Plus className="w-5 h-5 text-emerald-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">Recharger</h3>
-            </div>
-            <Button 
-              onClick={() => setShowRechargeCodePurchase(true)}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-4 rounded-xl text-base shadow-sm"
-            >
-              Recharger mon compte
-            </Button>
-          </div>
-        </div>
-
-        {/* Withdrawal Section */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-5">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <Minus className="w-5 h-5 text-red-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">Retrait</h3>
-            </div>
-
+        {activeTab === 'withdraw' ? (
+          <div className="space-y-5">
             {/* Amount Input */}
-            <div className="mb-5">
-              <label className="text-sm font-medium text-gray-600 mb-2 block">Montant</label>
+            <div className="rounded-3xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5">
+              <label className="text-sm font-medium text-slate-300 mb-3 block">Montant du retrait</label>
               <div className="relative">
                 <Input
                   type="number"
                   placeholder="0"
                   value={withdrawalAmount}
                   onChange={(e) => setWithdrawalAmount(e.target.value)}
-                  className="text-2xl font-semibold h-14 pr-16 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="text-3xl font-bold h-16 pr-20 bg-slate-900/50 border-slate-700 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   min="7000"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">FCFA</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">FCFA</span>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Min. 7 000 FCFA • Disponible: {formatAmountShort(profile.balance)} FCFA
+              <p className="text-xs text-slate-500 mt-3 flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                Minimum 7 000 FCFA
               </p>
             </div>
 
             {/* Payment Methods */}
-            <div className="mb-5">
-              <label className="text-sm font-medium text-gray-600 mb-3 block">Mode de paiement</label>
-              <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-3xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5">
+              <label className="text-sm font-medium text-slate-300 mb-4 block">Mode de paiement</label>
+              <div className="grid grid-cols-3 gap-3">
                 {paymentMethods.map((method) => (
                   <button
                     key={method.id}
                     onClick={() => selectPaymentMethod(method.id)}
-                    className={`p-3 rounded-xl border-2 transition-all ${
+                    className={`relative p-4 rounded-2xl border-2 transition-all duration-200 ${
                       selectedPaymentMethod === method.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-100 hover:border-gray-200 bg-gray-50'
+                        ? 'border-emerald-500 bg-emerald-500/10 scale-[1.02]'
+                        : 'border-slate-700 hover:border-slate-600 bg-slate-900/30'
                     }`}
                   >
+                    {selectedPaymentMethod === method.id && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-white rounded-full" />
+                      </div>
+                    )}
                     <img
                       src={method.image}
                       alt={method.name}
-                      className="w-10 h-10 mx-auto mb-1.5 rounded-lg object-cover"
+                      className="w-12 h-12 mx-auto mb-2 rounded-xl object-cover"
                     />
-                    <p className="text-[10px] text-center text-gray-600 font-medium leading-tight">{method.name}</p>
+                    <p className="text-[11px] text-center text-slate-400 font-medium leading-tight">{method.name}</p>
                   </button>
                 ))}
               </div>
@@ -288,8 +276,8 @@ const WithdrawalPage = () => {
 
             {/* Address Input */}
             {showAddressForm && selectedPaymentMethod && (
-              <div className="mb-5">
-                <label className="text-sm font-medium text-gray-600 mb-2 block">
+              <div className="rounded-3xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5 animate-in fade-in slide-in-from-top-2 duration-300">
+                <label className="text-sm font-medium text-slate-300 mb-3 block">
                   {paymentMethods.find(m => m.id === selectedPaymentMethod)?.name}
                 </label>
                 <div className="relative">
@@ -301,34 +289,24 @@ const WithdrawalPage = () => {
                     placeholder={getPlaceholderText(selectedPaymentMethod)}
                     value={paymentAddress}
                     onChange={(e) => setPaymentAddress(e.target.value)}
-                    className="pl-12 h-12 border-gray-200 rounded-xl"
+                    className="pl-12 h-14 bg-slate-900/50 border-slate-700 rounded-2xl text-white placeholder:text-slate-600 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
               </div>
             )}
 
+            {/* Submit Button */}
             <Button 
               onClick={handleWithdrawal}
               disabled={!withdrawalAmount || !selectedPaymentMethod || !paymentAddress}
-              className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold py-4 rounded-xl text-base shadow-sm transition-colors"
+              className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-500 text-white font-semibold py-6 rounded-2xl text-base shadow-lg shadow-emerald-500/20 disabled:shadow-none transition-all"
             >
-              Demander le retrait
+              Confirmer le retrait
             </Button>
           </div>
-        </div>
-
-        {/* Withdrawal History */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        ) : (
           <WithdrawalHistory />
-        </div>
-
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className="w-full py-4 text-red-500 font-semibold text-center hover:bg-red-50 rounded-2xl transition-colors"
-        >
-          Se déconnecter
-        </button>
+        )}
       </div>
 
       <Navigation />
