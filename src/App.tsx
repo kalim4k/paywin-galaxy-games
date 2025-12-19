@@ -12,6 +12,7 @@ import RobPage from "./pages/RobPage";
 import BazPage from "./pages/BazPage";
 import AuthPage from "./pages/AuthPage";
 import DicePage from "./pages/DicePage";
+import PlinkoPage from "./pages/PlinkoPage";
 import WithdrawalPage from "./pages/WithdrawalPage";
 import BonusPage from "./pages/BonusPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
@@ -57,6 +58,11 @@ const App = () => (
             <Route path="/dice" element={
               <ProtectedRoute>
                 <DicePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/plinko" element={
+              <ProtectedRoute>
+                <PlinkoPage />
               </ProtectedRoute>
             } />
             <Route path="/withdrawal" element={
