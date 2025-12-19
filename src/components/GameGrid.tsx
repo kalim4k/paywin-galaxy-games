@@ -44,7 +44,7 @@ export const GameGrid = () => {
       gradient: 'from-pink-500 to-purple-600',
       players: '673',
       trend: '+5%',
-      path: '/game-not-available/plinko'
+      path: '/plinko'
     }
   ];
 
