@@ -13,6 +13,7 @@ import BazPage from "./pages/BazPage";
 import AuthPage from "./pages/AuthPage";
 import DicePage from "./pages/DicePage";
 import PlinkoPage from "./pages/PlinkoPage";
+import PlusOuMoinsPage from "./pages/PlusOuMoinsPage";
 import WithdrawalPage from "./pages/WithdrawalPage";
 import BonusPage from "./pages/BonusPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
@@ -63,6 +64,11 @@ const App = () => (
             <Route path="/plinko" element={
               <ProtectedRoute>
                 <PlinkoPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/plus-ou-moins" element={
+              <ProtectedRoute>
+                <PlusOuMoinsPage />
               </ProtectedRoute>
             } />
             <Route path="/withdrawal" element={
