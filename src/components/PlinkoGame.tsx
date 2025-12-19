@@ -239,8 +239,8 @@ export const PlinkoGame: React.FC = () => {
           {/* Pegs */}
           {renderPegs()}
 
-          {/* Buckets */}
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+          {/* Buckets - positioned just below where pegs end */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex gap-1" style={{ top: `${(ROWS - 1) * PEG_SPACING_Y + 80}px` }}>
             {MULTIPLIERS.map((m, idx) => (
               <div
                 key={idx}
