@@ -225,7 +225,7 @@ export const PlinkoGame: React.FC = () => {
         </div>
 
         {/* Game Board */}
-        <div className="relative w-full max-w-sm aspect-[3/4] bg-gradient-to-b from-[#1e1035] to-[#130026] rounded-3xl border border-[#3c096c] shadow-[0_0_60px_rgba(76,29,149,0.3)] overflow-hidden">
+        <div className="relative w-full max-w-sm bg-gradient-to-b from-[#1e1035] to-[#130026] rounded-3xl border border-[#3c096c] shadow-[0_0_60px_rgba(76,29,149,0.3)] overflow-hidden" style={{ height: `${(ROWS - 1) * PEG_SPACING_Y + 140}px` }}>
           
           {/* Ball */}
           <div 
