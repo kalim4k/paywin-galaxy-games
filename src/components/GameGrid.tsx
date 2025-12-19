@@ -45,6 +45,16 @@ export const GameGrid = () => {
       players: '673',
       trend: '+5%',
       path: '/plinko'
+    },
+    {
+      id: 'plus-ou-moins',
+      name: 'PLUS OU MOINS',
+      description: 'Devinez si le total sera plus ou moins que 7',
+      image: 'https://bienetrechien.com/wp-content/uploads/2025/12/dicegame-2.png',
+      gradient: 'from-indigo-500 to-purple-600',
+      players: '1,089',
+      trend: '+18%',
+      path: '/plus-ou-moins'
     }
   ];
 
