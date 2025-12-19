@@ -50,6 +50,13 @@ export type Database = {
             foreignKeyName: "bet_history_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bet_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -87,6 +94,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "game_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "game_stats_user_id_fkey"
             columns: ["user_id"]
@@ -129,7 +143,21 @@ export type Database = {
             foreignKeyName: "money_transfers_receiver_id_fkey"
             columns: ["receiver_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "money_transfers_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "money_transfers_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_view"
             referencedColumns: ["id"]
           },
           {
@@ -178,6 +206,13 @@ export type Database = {
             foreignKeyName: "post_comments_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -208,6 +243,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_view"
             referencedColumns: ["id"]
           },
           {
@@ -256,6 +298,55 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      processed_webhooks: {
+        Row: {
+          amount: number
+          id: string
+          ip_address: string | null
+          processed_at: string
+          token_pay: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          id?: string
+          ip_address?: string | null
+          processed_at?: string
+          token_pay: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          id?: string
+          ip_address?: string | null
+          processed_at?: string
+          token_pay?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "processed_webhooks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "processed_webhooks_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -332,6 +423,13 @@ export type Database = {
             foreignKeyName: "recharge_codes_used_by_fkey"
             columns: ["used_by"]
             isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recharge_codes_used_by_fkey"
+            columns: ["used_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -366,6 +464,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transactions_user_id_fkey"
             columns: ["user_id"]
@@ -411,6 +516,13 @@ export type Database = {
             foreignKeyName: "withdrawals_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "withdrawals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -418,6 +530,33 @@ export type Database = {
       }
     }
     Views: {
+      leaderboard_view: {
+        Row: {
+          avatar_url: string | null
+          balance: number | null
+          display_name: string | null
+          favorite_game: string | null
+          id: string | null
+          total_withdrawn: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          balance?: number | null
+          display_name?: never
+          favorite_game?: string | null
+          id?: string | null
+          total_withdrawn?: never
+        }
+        Update: {
+          avatar_url?: string | null
+          balance?: number | null
+          display_name?: never
+          favorite_game?: string | null
+          id?: string | null
+          total_withdrawn?: never
+        }
+        Relationships: []
+      }
       withdrawals_with_profile: {
         Row: {
           amount: number | null
@@ -432,6 +571,13 @@ export type Database = {
           user_id: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "withdrawals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_view"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "withdrawals_user_id_fkey"
             columns: ["user_id"]
