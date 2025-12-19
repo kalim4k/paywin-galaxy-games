@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gamepad2, Wallet, User } from 'lucide-react';
+import { Gamepad2, Gift, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Navigation = () => {
@@ -8,16 +8,17 @@ export const Navigation = () => {
   
   const getActiveTab = () => {
     const path = location.pathname;
-    if (path === '/' || path.includes('mine') || path.includes('dice') || path.includes('baz') || path.includes('rob') || path.includes('game-not-available')) return 'jeu';
-    if (path.includes('withdrawal') || path.includes('bonus')) return 'portefeuille';
-    return 'jeu';
+    if (path === '/' || path.includes('mine') || path.includes('dice') || path.includes('baz') || path.includes('rob') || path.includes('game-not-available')) return 'jeux';
+    if (path.includes('bonus')) return 'bonus';
+    if (path.includes('withdrawal')) return 'profil';
+    return 'jeux';
   };
 
   const activeTab = getActiveTab();
 
   const navItems = [
-    { id: 'jeu', label: 'Jeu', icon: Gamepad2, path: '/' },
-    { id: 'portefeuille', label: 'Portefeuille', icon: Wallet, path: '/bonus' },
+    { id: 'jeux', label: 'Jeux', icon: Gamepad2, path: '/' },
+    { id: 'bonus', label: 'Bonus', icon: Gift, path: '/bonus' },
     { id: 'profil', label: 'Profil', icon: User, path: '/withdrawal' },
   ];
 
