@@ -19,6 +19,7 @@ import BonusPage from "./pages/BonusPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import FluxPage from "./pages/FluxPage";
 import GameNotAvailablePage from "./pages/GameNotAvailablePage";
+import TriumphPage from "./pages/TriumphPage";
 import NotFound from "./pages/NotFound";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
@@ -89,6 +90,11 @@ const App = () => (
             <Route path="/flux" element={
               <ProtectedRoute>
                 <FluxPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/triumph" element={
+              <ProtectedRoute>
+                <TriumphPage />
               </ProtectedRoute>
             } />
             <Route path="/game-not-available/:gameId" element={

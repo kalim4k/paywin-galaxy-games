@@ -1,6 +1,7 @@
 import React from 'react';
 import { Play, Star, TrendingUp, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import triumphImage from '@/assets/triumph-game.webp';
 
 export const GameGrid = () => {
   const navigate = useNavigate();
@@ -55,6 +56,16 @@ export const GameGrid = () => {
       players: '1,089',
       trend: '+18%',
       path: '/plus-ou-moins'
+    },
+    {
+      id: 'triumph',
+      name: 'TRIUMPH',
+      description: 'Détruisez les blocs et gagnez',
+      image: triumphImage,
+      gradient: 'from-cyan-500 to-blue-600',
+      players: '2,847',
+      trend: '+25%',
+      path: '/triumph'
     }
   ];
 
