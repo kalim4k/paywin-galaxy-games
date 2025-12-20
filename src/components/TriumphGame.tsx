@@ -37,11 +37,9 @@ interface TriumphGameProps {
   onBack: () => void;
   balance: number;
   updateBalance: (amount: number) => void;
-  initialTime: number;
-  onTimeUpdate: (secondsUsed: number) => void;
 }
 
-const TriumphGame: React.FC<TriumphGameProps> = ({ onBack, balance, updateBalance, initialTime, onTimeUpdate }) => {
+const TriumphGame: React.FC<TriumphGameProps> = ({ onBack, balance, updateBalance }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameStateRef = useRef<GameState>('AIMING');
   const ballsRef = useRef<Ball[]>([]);
@@ -61,15 +59,8 @@ const TriumphGame: React.FC<TriumphGameProps> = ({ onBack, balance, updateBalanc
   const totalSessionEarningsRef = useRef(0);
   const isFiringRef = useRef(false);
 
-  // Timer Refs
-  const lastTimeRef = useRef<number>(Date.now());
-  const accumulatedTimeRef = useRef<number>(0);
-  const timeLeftRef = useRef<number>(initialTime);
-
   const [uiScore, setUiScore] = useState(1);
-  const [uiTime, setUiTime] = useState(initialTime);
   const [gameOver, setGameOver] = useState(false);
-  const [timeUp, setTimeUp] = useState(false);
 
   // --- Init ---
   const initGame = () => {
@@ -85,14 +76,7 @@ const TriumphGame: React.FC<TriumphGameProps> = ({ onBack, balance, updateBalanc
     gameStateRef.current = 'AIMING';
     isFiringRef.current = false;
 
-    // Timer Reset
-    timeLeftRef.current = initialTime;
-    setUiTime(initialTime);
-    lastTimeRef.current = Date.now();
-    accumulatedTimeRef.current = 0;
-
     setGameOver(false);
-    setTimeUp(false);
     setUiScore(1);
     generateRow();
   };
@@ -180,33 +164,9 @@ const TriumphGame: React.FC<TriumphGameProps> = ({ onBack, balance, updateBalanc
   };
 
   const update = () => {
-    if (!canvasRef.current || gameOver || timeUp) return;
+    if (!canvasRef.current || gameOver) return;
     const ctx = canvasRef.current.getContext('2d');
     if (!ctx) return;
-
-    // --- Timer Logic ---
-    const now = Date.now();
-    const dt = (now - lastTimeRef.current) / 1000;
-    lastTimeRef.current = now;
-
-    if (gameStateRef.current === 'SHOOTING' || gameStateRef.current === 'AIMING') {
-      timeLeftRef.current -= dt;
-      accumulatedTimeRef.current += dt;
-
-      if (accumulatedTimeRef.current >= 1) {
-        onTimeUpdate(1);
-        accumulatedTimeRef.current -= 1;
-      }
-
-      if (timeLeftRef.current <= 0) {
-        timeLeftRef.current = 0;
-        setUiTime(0);
-        setTimeUp(true);
-        setGameOver(true);
-        return;
-      }
-      setUiTime(Math.ceil(timeLeftRef.current));
-    }
 
     // --- Shake Logic ---
     let shakeX = 0, shakeY = 0;
@@ -404,12 +364,6 @@ const TriumphGame: React.FC<TriumphGameProps> = ({ onBack, balance, updateBalanc
             {balance.toLocaleString()}<span className="text-xl text-white/80 font-bold">FCFA</span>
           </div>
         </div>
-        <div className="flex flex-col items-end">
-          <div className={`text-2xl font-black leading-none flex items-center gap-1 ${uiTime < 10 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
-            {uiTime}s
-          </div>
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Temps</div>
-        </div>
       </div>
       <div className="absolute inset-0 z-10 flex items-center justify-center">
         <canvas 
@@ -430,11 +384,11 @@ const TriumphGame: React.FC<TriumphGameProps> = ({ onBack, balance, updateBalanc
             <div className="w-1 h-16 bg-gradient-to-b from-white to-transparent mx-auto"></div>
           </div>
         )}
-        {(gameOver || timeUp) && (
+        {gameOver && (
           <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in">
             <Trophy className="w-20 h-20 text-yellow-400 mb-6" />
             <div className="text-6xl font-black text-white mb-4 tracking-tighter drop-shadow-sm uppercase">
-              {timeUp ? "Temps Écoulé" : "ÉCHEC"}
+              ÉCHEC
             </div>
             <div className="flex gap-8 mb-10 text-center">
               <div>
