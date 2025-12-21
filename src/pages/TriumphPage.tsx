@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Lock } from 'lucide-react';
 
 const ALLOWED_USER = 'SAINT';
-const SYNC_INTERVAL = 2000; // Sync to DB every 2 seconds
+const SYNC_INTERVAL = 1000; // Sync to DB every 1 second
 
 const TriumphPage = () => {
   const navigate = useNavigate();
