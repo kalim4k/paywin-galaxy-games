@@ -22,13 +22,17 @@ export const useMoneyTransfer = () => {
       return;
     }
 
+    // Sanitize query - escape special ILIKE characters to prevent SQL injection
+    const sanitizedQuery = query
+      .trim()
+      .replace(/[%_\\]/g, '\\$&')  // Escape %, _, \
+      .substring(0, 50);  // Limit length
+
     setSearchLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, email, full_name')
-        .or(`email.ilike.%${query}%,full_name.ilike.%${query}%`)
-        .limit(5);
+      const { data, error } = await supabase.rpc('search_users_for_transfer', {
+        search_query: sanitizedQuery
+      });
 
       if (error) throw error;
       setSearchResults(data || []);
