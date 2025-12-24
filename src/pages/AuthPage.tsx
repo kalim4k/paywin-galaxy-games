@@ -3,12 +3,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Lock, User, Eye, EyeOff, KeyRound } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
-
-const REGISTRATION_CODE = 'KALIM2026';
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,8 +16,7 @@ export const AuthPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    fullName: '',
-    registrationCode: ''
+    fullName: ''
   });
 
   const { signIn, signUp } = useAuth();
@@ -41,15 +38,6 @@ export const AuthPage = () => {
       if (isLogin) {
         await signIn(formData.email, formData.password);
       } else {
-        if (formData.registrationCode !== REGISTRATION_CODE) {
-          toast({
-            title: "Code invalide",
-            description: "Le code d'inscription est incorrect",
-            variant: "destructive"
-          });
-          setLoading(false);
-          return;
-        }
         if (formData.password !== formData.confirmPassword) {
           throw new Error('Les mots de passe ne correspondent pas');
         }
@@ -161,27 +149,6 @@ export const AuthPage = () => {
                     onChange={handleInputChange}
                     placeholder="Confirmez votre mot de passe"
                     className="pl-14 h-14 bg-white/25 border-white/40 text-white placeholder:text-white/70 focus:border-yellow-300 focus:ring-yellow-300 text-lg rounded-2xl"
-                    required={!isLogin}
-                  />
-                </div>
-              </div>
-            )}
-
-            {!isLogin && (
-              <div className="space-y-3">
-                <Label htmlFor="registrationCode" className="text-white font-semibold text-lg">
-                  Code d'inscription
-                </Label>
-                <div className="relative">
-                  <KeyRound className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 w-6 h-6" />
-                  <Input
-                    id="registrationCode"
-                    name="registrationCode"
-                    type="text"
-                    value={formData.registrationCode}
-                    onChange={handleInputChange}
-                    placeholder="Entrez le code d'inscription"
-                    className="pl-14 h-14 bg-white/25 border-white/40 text-white placeholder:text-white/70 focus:border-yellow-300 focus:ring-yellow-300 text-lg rounded-2xl uppercase"
                     required={!isLogin}
                   />
                 </div>
