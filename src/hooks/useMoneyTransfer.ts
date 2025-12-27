@@ -30,9 +30,11 @@ export const useMoneyTransfer = () => {
 
     setSearchLoading(true);
     try {
-      const { data, error } = await supabase.rpc('search_users_for_transfer', {
-        search_query: sanitizedQuery
-      });
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, full_name')
+        .or(`email.ilike.%${sanitizedQuery}%,full_name.ilike.%${sanitizedQuery}%`)
+        .limit(5);
 
       if (error) throw error;
       setSearchResults(data || []);

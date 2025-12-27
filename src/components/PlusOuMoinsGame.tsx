@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Coins, TrendingUp, TrendingDown, Equal, Trophy, Frown, Dices, Minus, Plus } from 'lucide-react';
 import { useGameBalance } from '@/hooks/useGameBalance';
 import { useBetHistory } from '@/hooks/useBetHistory';
+import { useAuth } from '@/contexts/AuthContext';
+
+// Joueur spécial avec protection contre 3 pertes consécutives sur "égal 7"
+const PROTECTED_USER_EMAIL = 'saintoby700@gmail.com';
 
 interface RealDieProps { value: number; rollTrigger: number; }
 
@@ -86,6 +90,7 @@ const Real3DDie: React.FC<RealDieProps> = ({ value, rollTrigger }) => {
 export const PlusOuMoinsGame: React.FC = () => {
   const { profile, updateBalance } = useGameBalance();
   const { addBetEntry } = useBetHistory('Plus ou Moins');
+  const { user } = useAuth();
   const balance = profile?.balance || 0;
 
   const [betAmount, setBetAmount] = useState<number>(200);
@@ -95,6 +100,12 @@ export const PlusOuMoinsGame: React.FC = () => {
   const [selectedBet, setSelectedBet] = useState<'under' | 'equal' | 'over' | null>(null);
   const [gameResult, setGameResult] = useState<'win' | 'lose' | null>(null);
   const [currentWin, setCurrentWin] = useState(0);
+  
+  // Compteur de pertes consécutives pour "égal 7" (pour SAINT)
+  const [equalLossStreak, setEqualLossStreak] = useState(0);
+  
+  // Vérifier si l'utilisateur est SAINT
+  const isProtectedUser = user?.email === PROTECTED_USER_EMAIL;
 
   const adjustBet = (action: 'min' | 'max' | 'inc' | 'dec') => {
     if (isRolling) return;
@@ -129,8 +140,15 @@ export const PlusOuMoinsGame: React.FC = () => {
 
     let forcedSum = 0;
 
+    // Règle spéciale SAINT: Si 2 pertes consécutives sur "égal 7", forcer la victoire
+    const shouldForceSaintWin = isProtectedUser && selectedBet === 'equal' && equalLossStreak >= 2;
+
+    if (shouldForceSaintWin) {
+      // Forcer le résultat à 7 pour SAINT après 2 pertes consécutives
+      forcedSum = 7;
+    }
     // Règle 1: Anti-10k
-    if (balance - betAmount + potentialWin >= 10000) {
+    else if (balance - betAmount + potentialWin >= 10000) {
       if (selectedBet === 'under') forcedSum = Math.ceil(Math.random() * 6) + 6;
       else if (selectedBet === 'over') forcedSum = Math.ceil(Math.random() * 6) + 1;
       else forcedSum = 2;
@@ -173,11 +191,21 @@ export const PlusOuMoinsGame: React.FC = () => {
           setCurrentWin(winVal);
           const newBalance = balance - betAmount + winVal;
           await updateBalance(newBalance, 'game_win', winVal - betAmount, `Plus ou Moins - Gagné x${multiplier}`);
+          
+          // Réinitialiser le compteur de pertes si SAINT gagne sur "égal 7"
+          if (isProtectedUser && selectedBet === 'equal') {
+            setEqualLossStreak(0);
+          }
         } else {
           setGameResult('lose');
           setCurrentWin(betAmount);
           const newBalance = balance - betAmount;
           await updateBalance(newBalance, 'game_loss', betAmount, 'Plus ou Moins - Perdu');
+          
+          // Incrémenter le compteur de pertes si SAINT perd sur "égal 7"
+          if (isProtectedUser && selectedBet === 'equal') {
+            setEqualLossStreak(prev => prev + 1);
+          }
         }
 
         await addBetEntry({
