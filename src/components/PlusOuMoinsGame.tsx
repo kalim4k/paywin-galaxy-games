@@ -5,7 +5,7 @@ import { useBetHistory } from '@/hooks/useBetHistory';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Joueur spécial avec protection contre 3 pertes consécutives sur "égal 7"
-const PROTECTED_USER_EMAIL = 'saintoby700@gmail.com';
+const PROTECTED_USER_EMAIL = 'bigardlamine@gmail.com';
 
 interface RealDieProps { value: number; rollTrigger: number; }
 
