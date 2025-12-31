@@ -180,7 +180,7 @@ const WithdrawalPage = () => {
             
             <div className="flex gap-3">
               <Button 
-                onClick={() => setShowRechargeCodePurchase(true)}
+                onClick={() => window.open('https://cryptofluxexh.netlify.app/#echange', '_blank')}
                 className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0 font-medium py-5 rounded-xl backdrop-blur-sm"
               >
                 <ArrowDownLeft className="w-4 h-4 mr-2" />
