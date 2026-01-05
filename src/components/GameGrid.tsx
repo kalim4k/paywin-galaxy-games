@@ -51,7 +51,7 @@ export const GameGrid = () => {
       id: 'plus-ou-moins',
       name: 'PLUS OU MOINS',
       description: 'Devinez si le total sera plus ou moins que 7',
-      image: 'https://bienetrechien.com/wp-content/uploads/2025/12/dicegame-2.png',
+      image: 'https://celinaroom.com/wp-content/uploads/2026/01/dicegame.png',
       gradient: 'from-indigo-500 to-purple-600',
       players: '1,089',
       trend: '+18%',
