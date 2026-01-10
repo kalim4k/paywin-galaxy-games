@@ -43,10 +43,10 @@ export const WithdrawalHistory = () => {
       case 'envoyé':
       case 'sent':
         return { 
-          icon: Loader2, 
-          color: 'text-amber-400', 
-          bg: 'bg-amber-500/10',
-          label: 'En cours'
+          icon: CheckCircle2, 
+          color: 'text-emerald-400', 
+          bg: 'bg-emerald-500/10',
+          label: 'Validé'
         };
       case 'completed':
       case 'terminé':
